@@ -38,7 +38,7 @@ Reference genome of D. suzukii
 - Fastqc on all the files 
 - Index building with hisat2 : 
 ```hisat2-build -p 4 /data/home/mtabourin/Stage_M1/Drosophila-Suzukii/ref_suzukii/Drosophila-suzukii-contig.fasta index/```
-- Mapping with hisat 2
+- Mapping with hisat 2 :
 
 
 ## TE analysis
