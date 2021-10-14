@@ -27,7 +27,20 @@ TEs represent 47% of the D. suzukii genome and can be important in the adaptatio
 
 ## Data
 
+DNA poolseq data from D.suzukii obtained with Illumina sequencing (2*100pb) :
+- One sample for G0 
+- One sample for each media in G12 (strawberry, cherry and cranberry)
 
+- Reference genome of D. suzukii 
+
+## SNP calling
+
+- Fastqc on all the files 
+- Index building with hisat2 : ```hisat2-build -p 4 /data/home/mtabourin/Stage_M1/Drosophila-Suzukii/ref_suzukii/Drosophila-suzukii-contig.fasta index/```
+- Mapping with hisat 2
+
+
+## TE analysis
 
 
 
