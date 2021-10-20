@@ -1,6 +1,18 @@
 # Genomic-and-transcriptomic-evolution-of-D.-Suzukii
 
 
+## Table of content
+
+1. Context
+2. Project
+3. Data 
+4. Requirements
+5. Polymorphism analysis
+6. TE analysis
+7. Authors
+8. Project status
+
+
 ## Context
 
 Since its recent invasion in the European and American continents, Drosophila suzukii, has become a major pest of berry crops. 
@@ -33,16 +45,34 @@ DNA poolseq data from D.suzukii obtained with Illumina sequencing (2*100pb) :
 
 Reference genome of D. suzukii 
 
+
+## Requirements
+
+### Conda environment
+
+### Versions of tools
+
+
 ## Polymoprhism Analysis
 
-- Fastqc on all the files 
+- Fastqc on all the files : 
+```fastqc input_file_name -o output_file_name``` 
 - Index building with hisat2 : 
 ```hisat2-build -p 4 /data/home/mtabourin/Stage_M1/Drosophila-Suzukii/ref_suzukii/Drosophila-suzukii-contig.fasta index/```
 - Mapping with hisat 2 :
-
+- Conversion of .sam files into .bam files :
+```samtools view -S -bh ../mapping/G0-MTP.sam | samtools sort -O bam -o G0-MTP-sorted.bam```
+- Index BAM files :
+```samtools index G0-MTP-sorted.bam```
+- Mpileup on .bam files / Call SNPs and short Indels :
+```samtools mpileup -uf ref_genome.fa G0-MTP-sorted.bam | bcftools call -mv > variant_calling.vcf```
+```bcftools filter -s LowQual -e '%QUAL<20 || DP>100' variant_calling.vcf  > variant_calling_filtered.vcf```
 
 ## TE analysis
 
 
+## Authors
 
+
+## Project status
 
