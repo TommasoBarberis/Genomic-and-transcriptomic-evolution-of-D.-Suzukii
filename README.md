@@ -45,7 +45,7 @@ DNA poolseq data from D.suzukii obtained with Illumina sequencing (2*100pb) :
 
 | File name    | Number of reads |
 | :----------: | :-------------: |
-| G0-MTP_1     | 2 345 637       |
+| G0-MTP_1     |        |
 | G0-MTP_2     | 
 | G12-cerise_1 | 
 | G12-cerise_2 | 
