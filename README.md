@@ -46,11 +46,33 @@ DNA poolseq data from D.suzukii obtained with Illumina sequencing (2*100pb) :
 Reference genome of D. suzukii 
 
 
+## Organization of the steps
+The pipeline includes the commands of the following softwares :
+- FASTQC, to perform a quality control of the raw data;
+- HiSAT2, to perform the alignment of raw data on the reference genome of D. Suzukii;
+- GATK, to perform the detection of variants in the data;
+- SAMtools, to perform the conversion of SAM files into BAM files, index them and analyze the coverage of mapped reads on the reference genome;
+- BCFtools, to compare VCF files;
+- Packages R
+- PoPoolation TE2
+- TEanalysis
+
+
 ## Requirements
 
 ### Conda environment
 
+
 ### Versions of tools
+- Python: version ;
+- FASTQC: version v0.11.9;
+- HiSAT2: version 2.1.0;
+- GATK: version 4.2.2.0;
+- SAMtools: version 1.9;
+- BCFtools: version 1.9;
+- Packages R: version
+- PoPoolation TE2: version
+- TEanalysis: version
 
 
 ## Polymoprhism Analysis
@@ -66,13 +88,22 @@ Reference genome of D. suzukii
 ```samtools index G0-MTP-sorted.bam```
 - Mpileup on .bam files / Call SNPs and short Indels :
 ```samtools mpileup -uf ref_genome.fa G0-MTP-sorted.bam | bcftools call -mv > variant_calling.vcf```
+- Bcftools on .vcf files :
 ```bcftools filter -s LowQual -e '%QUAL<20 || DP>100' variant_calling.vcf  > variant_calling_filtered.vcf```
 
 ## TE analysis
 
 
 ## Authors
+The project was developped by:
+- Tommaso BARBERIS
+- Bertrand HUGUENIN-BIZOT
+- Marie VERNERET
+- Chloé AUJOULAT
 
 
-## Project status
-
+## References
+- Anand, Santosh, Eleonora Mangano, Nadia Barizzone, Roberta Bordoni, Melissa Sorosina, Ferdinando Clarelli, Lucia Corrado, Filippo Martinelli Boneschi, Sandra D’Alfonso, et Gianluca De Bellis. « Next Generation Sequencing of Pooled Samples: Guideline for Variants’ Filtering ». Scientific Reports 6, no 1 (27 septembre 2016): 33735. https://doi.org/10.1038/srep33735.
+- Chiu, Joanna C, Xuanting Jiang, Li Zhao, Christopher A Hamm, Julie M Cridland, Perot Saelao, Kelly A Hamby, et al. « Genome of Drosophila suzukii, the Spotted Wing Drosophila ». G3 Genes|Genomes|Genetics 3, no 12 (1 décembre 2013): 2257‑71. https://doi.org/10.1534/g3.113.008185.
+- Kofler, Robert, Daniel Gómez-Sánchez, et Christian Schlötterer. « PoPoolationTE2: Comparative Population Genomics of Transposable Elements Using Pool-Seq ». Molecular Biology and Evolution 33, no 10 (octobre 2016): 2759‑64. https://doi.org/10.1093/molbev/msw137.
+- Olazcuaga, Laure, Julien Foucaud, Mathieu Gautier, Candice Deschamps, Anne Loiseau, Nicolas Leménager, Benoit Facon, et al. « Adaptation and Correlated Fitness Responses over Two Time Scales in Drosophila Suzukii Populations Evolving in Different Environments ». Journal of Evolutionary Biology 34, no 8 (2021): 1225‑40. https://doi.org/10.1111/jeb.13878.
