@@ -45,14 +45,14 @@ DNA poolseq data from D.suzukii obtained with Illumina sequencing (2*100pb) :
 
 | File name    | Number of reads |
 | :----------: | :-------------: |
-| G0-MTP_1     |        |
-| G0-MTP_2     | 
-| G12-cerise_1 | 
-| G12-cerise_2 | 
-| G12-cranb_1  | 
-| G12-cranb_2  | 
-| G12-fraise_1 | 
-| G12-fraise_2 |
+| G0-MTP_1     | 121 247 626     |
+| G0-MTP_2     | 121 247 626     |
+| G12-cerise_1 | 107 159 631     |
+| G12-cerise_2 | 107 159 631     |
+| G12-cranb_1  | 130 764 444     |
+| G12-cranb_2  | 130 764 444     |
+| G12-fraise_1 | 108 014 293     |
+| G12-fraise_2 | 108 014 293     |
 
 
 Reference genome of D. suzukii 
