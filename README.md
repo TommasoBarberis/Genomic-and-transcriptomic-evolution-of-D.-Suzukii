@@ -39,7 +39,7 @@ TEs represent 47% of the D. suzukii genome and can be important in the adaptatio
 
 ## Data
 
-DNA poolseq data from D.suzukii obtained with Illumina sequencing (2*100pb) :
+DNA poolseq data from D.suzukii obtained with paired-end Illumina sequencing (2*100pb) :
 - One poolseq for G0 
 - One poolseq for each media in G12 (strawberry, cherry and cranberry)
 
