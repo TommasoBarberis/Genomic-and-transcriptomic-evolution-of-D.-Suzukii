@@ -43,6 +43,18 @@ DNA poolseq data from D.suzukii obtained with Illumina sequencing (2*100pb) :
 - One poolseq for G0 
 - One poolseq for each media in G12 (strawberry, cherry and cranberry)
 
+| File name    | Number of reads |
+| :----------: | :-------------: |
+| G0-MTP_1     | 2 345 637       |
+| G0-MTP_2     | 
+| G12-cerise_1 | 
+| G12-cerise_2 | 
+| G12-cranb_1  | 
+| G12-cranb_2  | 
+| G12-fraise_1 | 
+| G12-fraise_2 |
+
+
 Reference genome of D. suzukii 
 
 
