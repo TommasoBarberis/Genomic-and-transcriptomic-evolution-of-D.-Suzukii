@@ -51,7 +51,11 @@ DNA poolseq data from D.suzukii obtained with paired-end Illumina sequencing (2*
 | G12-fraise   | 216 028 586     |
 
 
-Reference genome of D. suzukii 
+Reference genome of D. suzukii (precise which number and the contig file used as reference)
+
+
+
+
 
 
 ## Organization of the steps
@@ -66,13 +70,9 @@ The pipeline includes the commands of the following softwares :
 ### TE analysis
 All the steps are included in a tool named dnaPipeTE (available on :https://github.com/clemgoub/dnaPipeTE)
 - Uniform samplings of the reads to produce low coverage data sets 
-- Trinity, repeat assembly of contigs
-- 
-
-
-## Requirements
-
-### Conda environment
+- Trinity, repeated assembly of contigs
+- RepeatMasker, contigs annotation
+- Blastn, repeat quantification
 
 
 ### Versions of tools
@@ -81,7 +81,7 @@ All the steps are included in a tool named dnaPipeTE (available on :https://gith
 - GATK: version 4.2.2.0;
 - SAMtools: version 1.9;
 - BCFtools: version 1.9;
-- dnaPipeTE: version 1.3 (uses Perl 5, R v3.0.2, Python v3.8.5)
+- dnaPipeTE: version 1.3 (uses Perl 5, R v3.0.2, Python v3.8.5, Trinity v2.5.1, RepeatMasker v4.0.5 including RMblastn, ncbi-blast v2.2.28+)
 
 
 ## Polymoprhism Analysis
@@ -103,7 +103,14 @@ All the steps are included in a tool named dnaPipeTE (available on :https://gith
 
 ## TE analysis
 - dnaPipeTE on G0 file :
-```python3 ./dnaPipeTE.py -input /home/ubuntu/data/G0-MTP_1.fastq.gz -output /home/ubuntu/output_dnaPipeTE/G0 -cpu 6 -sample_number 3 -sample_size 121247626 -RM_lib /home/ubuntu/Drosophila_Transposable_Element_all.fasta -keep_Trinity_output```
+```python3 ./dnaPipeTE.py -input /home/ubuntu/data/G0-MTP_1.fastq.gz -output /home/ubuntu/output_dnaPipeTE/G0 -cpu 6 -sample_number 2 -genome_size 270000000 -genome_coverage 0.2 -RM_lib /home/ubuntu/Drosophila_Transposable_Element_all.fasta -keep_Trinity_output```
+
+Sampling 2 samples of max 355263 reads to reach 0.2X coverage of the 270Mb genome of D.suzukii :
+For G0 fastq :
+total number of reads: 121247626
+maximum number of reads to sample:  710526
+
+
 
 ## Authors
 The project was developped by:
