@@ -66,7 +66,8 @@ The pipeline includes the commands of the following softwares :
 ### TE analysis
 All the steps are included in a tool named dnaPipeTE (available on :https://github.com/clemgoub/dnaPipeTE)
 - Uniform samplings of the reads to produce low coverage data sets 
-- Trinity, reapeat assembly of contigs
+- Trinity, repeat assembly of contigs
+- 
 
 
 ## Requirements
