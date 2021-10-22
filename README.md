@@ -57,13 +57,16 @@ Reference genome of D. suzukii
 ## Organization of the steps
 The pipeline includes the commands of the following softwares :
 - FASTQC, to perform a quality control of the raw data;
+### SNP Calling
 - HiSAT2, to perform the alignment of raw data on the reference genome of D. Suzukii;
-- GATK, to perform the detection of variants in the data;
+- GATK and mpilup, to perform the detection of variants in the data;
 - SAMtools, to perform the conversion of SAM files into BAM files, index them and analyze the coverage of mapped reads on the reference genome;
 - BCFtools, to compare VCF files;
 - Packages R
-- PoPoolation TE2
-- TEanalysis
+### TE analysis
+All the steps are included in a tool named dnaPipeTE (available on :https://github.com/clemgoub/dnaPipeTE)
+- Uniform samplings of the reads to produce low coverage data sets 
+- Trinity, reapeat assembly of contigs
 
 
 ## Requirements
@@ -72,15 +75,12 @@ The pipeline includes the commands of the following softwares :
 
 
 ### Versions of tools
-- Python: version ;
 - FASTQC: version v0.11.9;
 - HiSAT2: version 2.1.0;
 - GATK: version 4.2.2.0;
 - SAMtools: version 1.9;
 - BCFtools: version 1.9;
-- Packages R: version
-- PoPoolation TE2: version
-- TEanalysis: version
+- dnaPipeTE: version 1.3 (uses Perl 5, R v3.0.2, Python v3.8.5)
 
 
 ## Polymoprhism Analysis
@@ -90,6 +90,7 @@ The pipeline includes the commands of the following softwares :
 - Index building with hisat2 : 
 ```hisat2-build -p 4 /data/home/mtabourin/Stage_M1/Drosophila-Suzukii/ref_suzukii/Drosophila-suzukii-contig.fasta index/```
 - Mapping with hisat 2 :
+
 - Conversion of .sam files into .bam files :
 ```samtools view -S -bh ../mapping/G0-MTP.sam | samtools sort -O bam -o G0-MTP-sorted.bam```
 - Index BAM files :
@@ -100,7 +101,8 @@ The pipeline includes the commands of the following softwares :
 ```bcftools filter -s LowQual -e '%QUAL<20 || DP>100' variant_calling.vcf  > variant_calling_filtered.vcf```
 
 ## TE analysis
-
+- dnaPipeTE on G0 file :
+```python3 ./dnaPipeTE.py -input /home/ubuntu/data/G0-MTP_1.fastq.gz -output /home/ubuntu/output_dnaPipeTE/G0 -cpu 6 -sample_number 3 -sample_size 121247626 -RM_lib /home/ubuntu/Drosophila_Transposable_Element_all.fasta -keep_Trinity_output```
 
 ## Authors
 The project was developped by:
@@ -115,3 +117,4 @@ The project was developped by:
 - Chiu, Joanna C, Xuanting Jiang, Li Zhao, Christopher A Hamm, Julie M Cridland, Perot Saelao, Kelly A Hamby, et al. « Genome of Drosophila suzukii, the Spotted Wing Drosophila ». G3 Genes|Genomes|Genetics 3, no 12 (1 décembre 2013): 2257‑71. https://doi.org/10.1534/g3.113.008185.
 - Kofler, Robert, Daniel Gómez-Sánchez, et Christian Schlötterer. « PoPoolationTE2: Comparative Population Genomics of Transposable Elements Using Pool-Seq ». Molecular Biology and Evolution 33, no 10 (octobre 2016): 2759‑64. https://doi.org/10.1093/molbev/msw137.
 - Olazcuaga, Laure, Julien Foucaud, Mathieu Gautier, Candice Deschamps, Anne Loiseau, Nicolas Leménager, Benoit Facon, et al. « Adaptation and Correlated Fitness Responses over Two Time Scales in Drosophila Suzukii Populations Evolving in Different Environments ». Journal of Evolutionary Biology 34, no 8 (2021): 1225‑40. https://doi.org/10.1111/jeb.13878.
+- Clément Goubert, Laurent Modolo, Cristina Vieira, Claire ValienteMoro, Patrick Mavingui, Matthieu Boulesteix, De Novo Assembly and Annotation of the Asian Tiger Mosquito (Aedes albopictus) Repeatome with dnaPipeTE from Raw Genomic Reads and Comparative Analysis with the Yellow Fever Mosquito (Aedes aegypti), Genome Biology and Evolution, Volume 7, Issue 4, April 2015, Pages 1192–1205, https://doi.org/10.1093/gbe/evv050
