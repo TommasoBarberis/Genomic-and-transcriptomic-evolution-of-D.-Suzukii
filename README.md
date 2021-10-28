@@ -61,6 +61,25 @@ Reference genome of D. suzukii (precise which number and the contig file used as
 ## Organization of the steps
 The pipeline includes the commands of the following softwares :
 - FASTQC, to perform a quality control of the raw data;
+### Mapping
+1. genome index
+```
+bwa index -p Drosophila-suzukii-contig.fasta.fai -a bwtsw Drosophila-suzukii-contig.fasta.fai
+```
+
+- __-p__: index name
+- __-a__: index algorithm (_bwtsw_ for long genome)
+
+
+2. mapping
+```
+bwa aln -t 14 Drosophila-suzukii-contig.fasta.fai sample_1.fastq.gz > sample_1.sai
+bwa aln -t 14 Drosophila-suzukii-contig.fasta.fai sample_2.fastq.gz > sample_2.sai
+
+bwa sampe Drosophila-suzukii-contig.fasta.fai sample_1.sai sample_2.sai sample_1.fastq.gz sample_2.fastq.gz > sample_pe.sam
+```
+
+-__-t__: number of threads
 ### SNP Calling
 - HiSAT2, to perform the alignment of raw data on the reference genome of D. Suzukii;
 - GATK and mpilup, to perform the detection of variants in the data;
