@@ -97,7 +97,9 @@ All the steps are included in a tool named dnaPipeTE (available on :https://gith
 - Index BAM files :
 ```samtools index G0-MTP-sorted.bam```
 - Mpileup on .bam files / Call SNPs and short Indels :
-```samtools mpileup -uf ref_genome.fa G0-MTP-sorted.bam | bcftools call -mv > variant_calling.vcf```
+```samtools mpileup sam_to_bam/G0-MTP-sorted.bam -f /data/home/mtabourin/Stage_M1/Drosophila-Suzukii/ref_suzukii/Drosophila-suzukii-contig.fasta > variant_calling_mpileup/G0-MTP.pileup```
+```bcftools mpileup -o G0-MTP-VCFfile.vcf -f /data/home/mtabourin/Stage_M1/Drosophila-Suzukii/ref_suzukii/Drosophila-suzukii-contig.fasta ../sam_to_bam/G0-MTP-sorted.bam```
+```bcftools call -vmO v -o bcftools_call/G0-MTP-VCFfile-call.vcf variant_calling_mpileup/G0-MTP-VCFfile.vcf```
 - Bcftools on .vcf files :
 ```bcftools filter -s LowQual -e '%QUAL<20 || DP>100' variant_calling.vcf  > variant_calling_filtered.vcf```
 
@@ -114,10 +116,10 @@ maximum number of reads to sample:  710526
 
 ## Authors
 The project was developped by:
+- Chloé AUJOULAT
 - Tommaso BARBERIS
 - Bertrand HUGUENIN-BIZOT
 - Marie VERNERET
-- Chloé AUJOULAT
 
 
 ## References
