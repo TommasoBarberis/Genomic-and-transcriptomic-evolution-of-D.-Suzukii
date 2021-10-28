@@ -116,9 +116,13 @@ All the steps are included in a tool named dnaPipeTE (available on :https://gith
 - Index BAM files :
 ```samtools index G0-MTP-sorted.bam```
 - Mpileup on .bam files and bcftools for call SNPs and short Indels :
+
 ```samtools mpileup sam_to_bam/G0-MTP-sorted.bam -f /data/home/mtabourin/Stage_M1/Drosophila-Suzukii/ref_suzukii/Drosophila-suzukii-contig.fasta > variant_calling_mpileup/G0-MTP.pileup```
+
 ```bcftools mpileup -o G0-MTP-VCFfile.vcf -f /data/home/mtabourin/Stage_M1/Drosophila-Suzukii/ref_suzukii/Drosophila-suzukii-contig.fasta ../sam_to_bam/G0-MTP-sorted.bam```
+
 ```bcftools call -vmO v -o bcftools_call/G0-MTP-VCFfile-call.vcf variant_calling_mpileup/G0-MTP-VCFfile.vcf```
+
 - Bcftools filter on .vcf files :
 ```bcftools filter -O v -o bcftools_filtered/G0-MTP-VCFfile-filtered.vcf -s LOWQUAL -i 'QUAL>10' -g3 -G10 bcftools_call/G0-MTP-VCFfile-call.vcf```
 
