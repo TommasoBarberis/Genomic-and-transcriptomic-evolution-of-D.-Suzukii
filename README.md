@@ -80,6 +80,17 @@ bwa sampe Drosophila-suzukii-contig.fasta.fai sample_1.sai sample_2.sai sample_1
 ```
 
 -__-t__: number of threads
+
+
+#### Mapping stats
+
+| sample | raw sequences | mapped and paired squences |
+| ------ | ------------- | -------------------------- |
+| G0-MTP_pe | 242495252 | 194326801 |
+| G12-fraise_pe | 216028586 | 172898366 |
+| G12-cerise_pe | 214319262 | 172440052 |
+| G12-cranb_pe | 261528888 | 212135984 |
+
 ### SNP Calling
 - HiSAT2, to perform the alignment of raw data on the reference genome of D. Suzukii;
 - GATK and mpilup, to perform the detection of variants in the data;
