@@ -19,4 +19,4 @@ echo -e "MarkDuplicateSpark"
 gatk MarkDuplicatesSpark -I G12-cranb_ReadGroups.bam -O G12-cranb_MarkDuplicated.bam --spark-master local[16]
 
 echo -e "HaplotyeCaller"
-matk HaplotypeCaller --native-pair-hmm-threads 16 -R /home/ubuntu/index/Drosophila-suzukii-contig.fasta -I G12-cranb_MarkDuplicated.bam -O G12-cranb.g.vcf.gz -ERC GVCF
+gatk HaplotypeCaller -R ~/ref/Drosophila-suzukii-contig.fasta -I ~/G12_cerise_MarkDuplicated.bam --sample-ploidy 80 -O G12_cerise_MarkDuplicated.bam.vcf --max-genotype-count 91881
