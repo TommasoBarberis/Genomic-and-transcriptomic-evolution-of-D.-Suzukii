@@ -132,3 +132,7 @@ for (sample in samples) {
   }
 }
 ```
+
+```{r}
+dim(data)
+```
