@@ -71,8 +71,9 @@ The objective is detect variant sites in the dataset.
 ```
 	gatk HaplotypeCaller \
 		-R ref.fasta \
-		-I file.bam \
+		-I file.bam \ # after MarkDuplicated
 		--sample-ploidy [2 x pool size] # in our case, it may be 2 x 40 \
+		--max-genotype-count 91881
 		-O output.vcf
 ```
 
@@ -87,7 +88,7 @@ The objective is detect variant sites in the dataset.
 ```
 
 ## SNP filtering
-1. Remove low quality SNPs
+1. Generate table that can be used to find filter threshold:
 
 ```
 	gatk VariantsToTable \
@@ -98,35 +99,51 @@ The objective is detect variant sites in the dataset.
 		-F CHROM \
 		-F POS \
 		-F QUAL \
+		-F AC \
+		-F AF \
 		-F DP \
 		-F QD \
 		-F MQ \
 		-F FS \
 		-F SOR \
-		-F MQRankSum
+		-F MQRankSum \
+		-F ReadPosRankSum
 ```
 
 The best way to choose the right filter, is to plot the several quality scores across the VCF file, for exemple using _ggplot2_ from __R__.
 
+2. Use filtrer on the `vcf` file having only __SNPs__:
 ```
 	gatk VariantFiltration \
 		-R reference_genome.fasta \
 		-V input.vcf \
 		-O output.vcf \
 		# following results observed in plots
-		-filter "QUAL < 20" --filter-name Low_Qual\
-		-filter "DP < 88" --filter-name Low_Cov \
-		-filter "QD < 20.0 || MQ < 50.0 || FS > 1.0 || \
-		SOR > 1.5 || MQRendSum < -1.0" \
-		--filter-name Secondary_filter
+		-filter "QUAL < 70" --filter-name Low_Qual\
+		-filter "DP < 90" --filter-name Low_Cov \
+		-filter "QD < 20.0 || MQ < 28.0 || FS > 1.0 || \
+		SOR > 1.4 --filter-name Secondary_filter
 ```
 
+3. Extract __SNPs__ having pass filter:
 ```
 	gatk SelectVariants \
 		-R reference_genome.fasta \
 		-V input.vcf \
 		-O output.vcf \
 		--exclude-filtered	
+```
+
+## Get __SNPs__ that are in transcripts (mRNA)
+
+1. Obtain the `.bed`, if necessary:
+```
+gff2bed < mRNA.gff3 > mRNA.bed
+```
+
+2. Intersect the `.vcf` file with the `.bed` file:
+```
+intersectBed -a input.vcf -b mRNA.bed - header > output.vcf
 ```
 
 ## Recalibration
