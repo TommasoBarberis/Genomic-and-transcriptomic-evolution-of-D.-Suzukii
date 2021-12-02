@@ -86,7 +86,9 @@ We noticed a high __GC__ rate in the reads, but it seems to be in accordance wit
 
 1. Genome indexing:
 ```
-bwa index -p Drosophila-suzukii-contig.fasta.fai -a bwtsw Drosophila-suzukii-contig.fasta
+bwa index \
+    -p Drosophila-suzukii-contig.fasta.fai \
+    -a bwtsw Drosophila-suzukii-contig.fasta
 ```
 
 - `-p`: index name;
@@ -101,7 +103,9 @@ bwa aln -t 14 Drosophila-suzukii-contig.fasta.fai sample_2.fastq.gz > sample_2.s
 
 3. Merge of the `.sai` files from forward and reverse reads:
 ```
-bwa sampe Drosophila-suzukii-contig.fasta.fai sample_1.sai sample_2.sai sample_1.fastq.gz sample_2.fastq.gz > sample_pe.sam
+bwa sampe Drosophila-suzukii-contig.fasta.fai \
+    sample_1.sai sample_2.sai \
+    sample_1.fastq.gz sample_2.fastq.gz > sample_pe.sam
 ```
 - `sampe`: take in account to have paired ends reads.
 
@@ -152,7 +156,15 @@ gatk SortSam -I sample.bam -O sample_sorted.bam -SO queryname -VALIDATION_STRING
 
 2. Add read group info:
 ```
-gatk AddOrReplaceReadGroups -I sample_sorted.bam -O sample_ReadGroups.bam -RGID name -RGLB name -RGPL ILLUMINA -RGPU name -RGSM sample -VALIDATION_STRINGENCY SILENT
+gatk AddOrReplaceReadGroups \
+    -I sample_sorted.bam \
+    -O sample_ReadGroups.bam \
+    -RGID name \
+    -RGLB name \
+    -RGPL ILLUMINA \
+    -RGPU name \
+    -RGSM sample \
+    -VALIDATION_STRINGENCY SILENT
 ```
 
 - `-I`: input file;
@@ -168,7 +180,10 @@ __NB:__ Read group information flags (`-RG*`) are mandatory, even if you don't h
 
 3. Remove duplicate:
 ```
-gatk MarkDuplicatesSpark -I sample_ReadGroups.bam -O sample_MarkDuplicated.bam --spark-master local[16]
+gatk MarkDuplicatesSpark \
+    -I sample_ReadGroups.bam \
+    -O sample_MarkDuplicated.bam \
+    --spark-master local[16]
 ```
 - `-I`: input file;
 - `-O`: output file;
@@ -176,7 +191,11 @@ gatk MarkDuplicatesSpark -I sample_ReadGroups.bam -O sample_MarkDuplicated.bam -
 
 4. Detect variant sites in the dataset:
 ```
-gatk HaplotypeCaller -R reference.fasta -I sample_MarkDuplicated.bam --sample-ploidy 80 -O sample.vcf --max-genotype-count 91881
+gatk HaplotypeCaller \
+    -R reference.fasta \
+    -I sample_MarkDuplicated.bam \
+    --sample-ploidy 80 -O sample.vcf \
+    --max-genotype-count 91881
 ```
 - `-R`: genome reference;
 - `-I`: input file;
@@ -188,6 +207,142 @@ In our case we have a ploidy of 2 (_D. suzukii_ is a diploïd organism) and a po
 $max\_genotype\_count = \binom{P +  A - 1}{A - 1} = \frac{(P + A - 1)!}{P!(A - 1)!}$ <br>
 With `P` la ploidy of the sample (previous formula) and `A` ($A = 3$) the allele count. 
 
+#### 4.3.1 SNPs filtering
+
+1. First of all, we have make a subset having only __SNPs__:
+```
+gatk SelectVariants \
+    -R reference_genome.fasta \
+    -V input.vcf \
+    -O output.vcf \
+    --select-type-to-include SNP
+```
+- `-R`: genome reference;
+- `-V`: `.vcf` input file;
+- `-O`: output file;
+- `--select-type-to-include` select a type of variant.
+
+2. Generate a table that can be used to find filter threshold:
+```
+	gatk VariantsToTable \
+		-R reference_genome.fasta \
+		-V input.vcf \
+		-O output.table \
+		# scores to save to the table
+		-F CHROM \
+		-F POS \
+		-F QUAL \
+		-F AC \
+		-F AF \
+		-F DP \
+		-F QD \
+		-F MQ \
+		-F FS \
+		-F SOR \
+		-F MQRankSum \
+		-F ReadPosRankSum
+```
+- `-R`: reference;
+- `-V`: `.vcf` input file;
+- `-O`: output file;
+- `-F`: selected field.
+
+The best way to choose the right filter, is to plot the several scores across the VCF file, for example using `ggplot2` library in `R`.
+You can find here the plot for some scores: <br/>
+
+<img src="./img/DP.svg"/>
+<img src="./img/FS.svg"/>
+<img src="./img/MQ.svg"/>
+<img src="./img/QD.svg"/>
+<img src="./img/QUAL.svg"/>
+<img src="./img/SOR.svg"/>
+
+<br/>
+
+3. Use filter on the `vcf` file:
+```
+	gatk VariantFiltration \
+		-R reference_genome.fasta \
+		-V input.vcf \
+		-O output.vcf \
+		# following results observed in plots
+		-filter "QUAL < 70" --filter-name Low_Qual\
+		-filter "DP < 90" --filter-name Low_Cov \
+		-filter "QD < 20.0 || MQ < 28.0 || FS > 1.0 || \
+		SOR > 1.4 --filter-name Secondary_filter
+```
+- `-R`: reference;
+- `-V`: `vcf` input file;
+- `-O`: output file;
+- `-filter`: define a filter;
+- `--filter-name`: used to assign a name to the filter.
+
+4. Extract __SNPs__ having pass filter:
+```
+gatk SelectVariants \
+		-R reference_genome.fasta \
+		-V input.vcf \
+		-O output.vcf \
+		--exclude-filtered
+```
+- `-R`: reference;
+- `-V`: `vcf` input file;
+- `-O`: output file;
+- `--exclude-filtered`: exclude __SNPs__ marked to be filtered.
+
+#### 4.3.2 Get __SNPs__ that are in transcripts (mRNA)
+
+1. From the `.gff3` file of the reference, we can extract a subset having only mRNA:
+```
+tail -n +2 Drosophila-suzukii-annotation-3-ws.gff3 | \
+awk -F "\t" '{if($3=="mRNA") print $0}' > ~/mRNA.gff3
+```
+- `tail -n +2`: to skip `gff3` header;
+- `awk`: if the third field has 'mRNA' tag, it print the line in the `mRNA.gff3` file.
+
+2. Convert the `.gff3` into `.bed` format:
+```
+gff2bed < mRNA.gff3 > mRNA.bed
+```
+
+3. Intersect the `.vcf` file with the `.bed` file:
+```
+intersectBed -a input.vcf -b mRNA.bed -header > output.vcf
+```
+- `-a`: `.vcf` input file;
+- `-b`: `.bed` input file;
+- `-header`: if the `.bed` file has header.
+
+#### 4.3.3  Get __SNPs__ that are in DE genes
+List of the DE genes can be found here: <br/>
+
+Location: _pedago-ngs_ 
+```
+/localdata/pandata/students/M2_projet_15/DE_gene
+```
+This list is obtained by the M. Tabourin's work.
+
+1. Obtain a `.gff3` file containing only DE genes:
+```
+python3 get_de.py
+```
+- `get_de.py`: it is a script written by us. It allows, from the `gff3` and the `list.txt` having DE genes, to obtain a `.gff3` file having only DE genes.
+
+2. Then we have transformed the obtained `.gff3` file into `.bed` file using the command `3` at the previous paragraph and we have used it to obtain __SNPs__ in DE genes using command `4` of the previous paragraph.
+
+#### 4.3.4 Results
+
+Location of `.vcf` result files: _pedago-ngs_
+```
+/localdata/pandata/students/M2_projet_15/GATK_pipeline/gatk_ploidy
+```
+
+| | Total number of SNPs | SNPs on mRNA | SNPs on DE genes |
+| :-: | :-: | :-: | :-: |
+| G0-MTP | 189,567 | 121,646 | 1,465 |
+| G12-strawberry | 175,067 | 111,761 | 1,264 |
+| G12-cherry | 186,952 | 115,760 | 1,242 |
+| G12-cranberry | 116,006 | 75,305 | 1,050 | 
 
 ### TE analysis
 All the steps are included in a tool named dnaPipeTE (available on :https://github.com/clemgoub/dnaPipeTE)
@@ -260,3 +415,7 @@ The project was developped by:
 - Li H. and Durbin R. (2009) Fast and accurate short read alignment with Burrows-Wheeler Transform. Bioinformatics, 25:1754-60. [PMID: 19451168].
 - Heng Li, Bob Handsaker, Alec Wysoker, Tim Fennell, Jue Ruan, Nils Homer, Gabor Marth, Goncalo Abecasis, Richard Durbin, 1000 Genome Project Data Processing Subgroup, The Sequence Alignment/Map format and SAMtools, Bioinformatics, Volume 25, Issue 16, 15 August 2009, Pages 2078–2079, https://doi.org/10.1093/bioinformatics/btp352.
 - Van der Auwera GA & O'Connor BD. (2020). Genomics in the Cloud: Using Docker, GATK, and WDL in Terra (1st Edition). O'Reilly Media.
+- Wickham H (2016). ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York. ISBN 978-3-319-24277-4, https://ggplot2.tidyverse.org.
+- R Core Team (2021). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. URL https://www.R-project.org/.
+- Bedops.readthedocs.io. 2021. 6.3.3.5. gff2bed — BEDOPS v2.4.40. (online) Available at: https://bedops.readthedocs.io/en/latest/content/reference/file-management/conversion/gff2bed.html (Accessed 2 December 2021).
+- Bedtools.readthedocs.io. 2021. intersect — bedtools 2.30.0 documentation. (online) Available at: https://bedtools.readthedocs.io/en/latest/content/tools/intersect.html (Accessed 2 December 2021).
