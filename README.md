@@ -344,6 +344,25 @@ Location of `.vcf` result files: _pedago-ngs_
 | G12-cherry | 186,952 | 115,760 | 1,242 |
 | G12-cranberry | 116,006 | 75,305 | 1,050 | 
 
+
+### Comparison of our results from DNA data with RNA seq data
+
+1. Compress VCF files: ```bgzip input_DNA_file.vcf``` and ```bgzip input_RNA_file.vcf```
+2. Build indexes for compressed files: ```tabix -p vcf input_DNA_file.vcf.gz``` and ```tabix -p vcf input_RNA_file.vcf.gz```
+3. Run bcftools isec to make the intersection between the files of interest: ```bcftools isec -c snps -p /fraise input_DNA_file.vcf.gz input_RNA_file.vcf.gz path2repository```
+
+#### Results
+
+Location of 4 output result files: _pedago-ngs_
+```
+/localdata/pandata/students/M2_projet_15/GATK_pipeline/gatk_ploidy/$fruit
+```
+- First file: 0000.vcf for records private to  fraise/G12_fraise_MarkDuplicated.bam.vcf.gz
+- Second file: 0001.vcf for records private to  variants_RNAseq.vcf.gz
+- Third file: 0002.vcf for records from fraise/G12_fraise_MarkDuplicated.bam.vcf.gz shared by both     fraise/G12_fraise_MarkDuplicated.bam.vcf.gz variants_RNAseq.vcf
+- Fourth file: 0003.vcf for records from variants_RNAseq.vcf.gz shared by both  fraise/G12_fraise_MarkDuplicated.bam.vcf.gz variants_RNAseq.vcf.gz
+
+
 ### TE analysis
 All the steps are included in a tool named dnaPipeTE (available on :https://github.com/clemgoub/dnaPipeTE)
 - Uniform samplings of the reads to produce low coverage data sets 
