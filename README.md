@@ -349,7 +349,7 @@ Location of `.vcf` result files: _pedago-ngs_
 
 1. Compress VCF files: ```bgzip input_DNA_file.vcf``` and ```bgzip input_RNA_file.vcf```
 2. Build indexes for compressed files: ```tabix -p vcf input_DNA_file.vcf.gz``` and ```tabix -p vcf input_RNA_file.vcf.gz```
-3. Run bcftools isec to make the intersection between the files of interest: ```bcftools isec -c snps -p /fraise input_DNA_file.vcf.gz input_RNA_file.vcf.gz path2repository```
+3. Run bcftools isec to make the intersection between the files of interest: ```bcftools isec -c snps -p fraise/ input_DNA_file.vcf.gz input_RNA_file.vcf.gz path2repository```
 
 #### Results
 
