@@ -435,7 +435,7 @@ s_G0-MTP_1.fastq done.
 The pipeline gives several useful outputs such as the Landscapes (TE divergence to estimate the insertions) and PieChart (TE families proportions in the genome).
 Other graphs have been created with the script `graphs.R` to compare TE throught different sample generation. 
 
-<img src="./img/prop_ech_par_family.jpg"/>
+<img src="./TE_analysis/prop_ech_par_family.jpg"/>
 
 Other graphs can be found in the `graphs.pdf` document.
 
