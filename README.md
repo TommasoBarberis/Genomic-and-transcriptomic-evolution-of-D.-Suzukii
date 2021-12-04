@@ -81,8 +81,8 @@ Location: _pedago-ngs_
 /localdata/pandata/students/M2_projet_15/quality_control
 ```
 
-Then, we merged results from `fastqc` using `multiqc` in the folder with `fastqc` reports. The `html` report is here in the `quality_control` folder. <br>
-We noticed a high __GC__ rate in the reads, but it seems to be in accordance with the results from other research on _D. suzukii_.
+Then, we merged results from `fastqc` using `multiqc` in the folder with `fastqc` reports. The `html` report is available in the `quality_control` folder. <br>
+We noticed a high __GC__ rate in the reads, but it seems to be in accordance with the results obtained by other researchs on _D. suzukii_.
 
 ### 4.2 Mapping
 
@@ -103,7 +103,7 @@ bwa aln -t 14 Drosophila-suzukii-contig.fasta.fai sample_2.fastq.gz > sample_2.s
 ```
 - `-t`: number of threads.
 
-3. Merge of the `.sai` files from forward and reverse reads:
+3. Merge the `.sai` files of forward and reverse reads:
 ```
 bwa sampe Drosophila-suzukii-contig.fasta.fai \
     sample_1.sai sample_2.sai \
@@ -113,7 +113,7 @@ bwa sampe Drosophila-suzukii-contig.fasta.fai \
 
 #### Mapping stats
 
-Calculation of statistics of mapped files using:
+Computation of mapped files statistics using:
 ```
 samtools stats sample.sam
 ```
@@ -142,7 +142,7 @@ __NB:__ Before using `bwa`, we tried to use `hisat2` but, for an unkown reason i
 
 
 ### 4.3 Variant Calling
-The SNP calling on pooled data is still not largely used because it is very innovative. For this reason has required several tests (with different tools) and long time to be completed. <br>
+The SNP calling on pooled data is still not largely used because it is very innovative. For this reason it has required several tests (with different tools) and a long time to be completed. <br>
 Finally, we used `GATK` to perform our SNP calling and for that we were inspired by M. Tabourin's workflow ([Analyse experience d'évolution expérimentale _D.suzukii_](https://github.com/mtabourin/Analyse-experience-d-evolution-experimentale-D.suzukii)) and from [this](https://yeamanlab.weebly.com/uploads/5/7/9/5/57959825/snp_calling_pipeline.pdf) document.
 
 1. Sorting `.bam` files:
@@ -181,7 +181,7 @@ gatk AddOrReplaceReadGroups \
 
 __NB:__ Read group information flags (`-RG*`) are mandatory, even if you don't have them.
 
-3. Remove duplicate:
+3. Remove duplicates:
 ```
 gatk MarkDuplicatesSpark \
     -I sample_ReadGroups.bam \
@@ -212,7 +212,7 @@ With `P` la ploidy of the sample (previous formula) and `A` ($A = 3$) the allele
 
 #### 4.3.1 SNPs filtering
 
-1. First of all, we have make a subset having only __SNPs__:
+1. Crete a subset keeping only __SNPs__:
 ```
 gatk SelectVariants \
     -R reference_genome.fasta \
@@ -225,7 +225,7 @@ gatk SelectVariants \
 - `-O`: output file;
 - `--select-type-to-include` select a type of variant.
 
-2. Generate a table that can be used to find filter threshold:
+2. Generate a table that can be used to find filter thresholds:
 ```
 	gatk VariantsToTable \
 		-R reference_genome.fasta \
@@ -251,7 +251,7 @@ gatk SelectVariants \
 - `-F`: selected field.
 
 The best way to choose the right filter, is to plot the several scores across the VCF file, for example using `ggplot2` library in `R`.
-You can find here the plot for some scores: <br/>
+You can find here the plot used to define some scores: <br/>
 
 <img src="./img/DP.svg"/>
 <img src="./img/FS.svg"/>
@@ -262,7 +262,7 @@ You can find here the plot for some scores: <br/>
 
 <br/>
 
-3. Use filter on the `vcf` file:
+3. Use filter on `vcf` files:
 ```
 	gatk VariantFiltration \
 		-R reference_genome.fasta \
@@ -280,7 +280,7 @@ You can find here the plot for some scores: <br/>
 - `-filter`: define a filter;
 - `--filter-name`: used to assign a name to the filter.
 
-4. Extract __SNPs__ having pass filter:
+4. Extract __SNPs__ who passed the filters:
 ```
 gatk SelectVariants \
 		-R reference_genome.fasta \
@@ -375,20 +375,21 @@ All the steps are included in a tool named [dnaPipeTE](https://github.com/clemgo
 - Blastn, repeat quantification
 
 <img src="./TE_analysis/dnapipete.jpg"/>
+Figure from the [tool publication](https://academic.oup.com/gbe/article/7/4/1192/533768)
 
 ### 6.1 Running DnaPipeTE
 ```
 #dnaPipeTE: version 1.3 (uses Perl 5, R v3.0.2, Python v3.8.5, Trinity v2.5.1, 
 			      RepeatMasker v4.0.5 including RMblastn, ncbi-blast v2.2.28+)
 ```
-We had a lot of dependancies problem to run dnaPipeTE so we used the [docker version](https://hub.docker.com/r/clemgoub/dnapipete).
+We had a lot of dependancies problems running dnaPipeTE so we used the [docker version](https://hub.docker.com/r/clemgoub/dnapipete).
 
 1. Copy input data
-Two different type of input is necessary to run the pipeline : 
-- The fastq files for all the samples
+Two different types of input are necessary to run the pipeline : 
+- The fastq files for each samples
 - `Drosophila_Transposable_Element_all.fasta` which is the Drosophila TE library from Repbase  
 
-Location : 
+Location :  _pedago-ngs_
 ```
 /localdata/pandata/students/M2_projet_15/TE/
 ```
@@ -418,7 +419,7 @@ python3 dnaPipeTE.py \
 - `-cpu`: maximum number of cpu to use;
 - `-genome_size`: here we know that _D.suzukii_ is 270Mb long;
 - `-genome_coverage`: for this genome size 0.2X is recommended in the Supplementary Material of the [tool article](https://academic.oup.com/gbe/article/7/4/1192/533768);
-- `-sample_number`: number of Trinity iterations;
+- `-sample_number`: number of Trinity iterations (2 is the minimum and recommended number of iterations);
 - `-RM_lib`: path to custom repeat library for RepeatMasker.
 
 ### 6.2 Results
