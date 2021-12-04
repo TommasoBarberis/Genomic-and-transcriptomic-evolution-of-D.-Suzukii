@@ -69,6 +69,8 @@ Location: _pedago-ngs_
 
 ## 4. SNP Calling Workflow
 
+<img src="./img/schema snp calling (1).jpg"/>
+
 ### 4.1 Quality control
 
 First of all we checked the quality of the data, using `fastqc` _(version v0.11.9)_:
