@@ -1,0 +1,15 @@
+LTR	13,64
+LINE	6,62
+SINE	0,00
+DNA	8,28
+MITE	0,00
+Helitron	0,00
+rRNA	0,00
+Low_Complexity	0,15
+Satellite	0,00
+Tandem_repeats	0,00
+Simple_repeat	3,92
+others	0,32
+na	2,29
+Others	0,00
+Total_TE	35,22
