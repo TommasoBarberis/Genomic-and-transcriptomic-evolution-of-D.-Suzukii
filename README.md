@@ -374,6 +374,8 @@ All the steps are included in a tool named [dnaPipeTE](https://github.com/clemgo
 - RepeatMasker, contigs annotation
 - Blastn, repeat quantification
 
+<img src="./TE_analysis/dnapipete.jpg"/>
+
 ### 6.1 Running DnaPipeTE
 ```
 #dnaPipeTE: version 1.3 (uses Perl 5, R v3.0.2, Python v3.8.5, Trinity v2.5.1, 
@@ -432,8 +434,8 @@ s_G0-MTP_1.fastq done.
 53999976 bases sampled in 710526 reads
 s_G0-MTP_1.fastq done.
 ```
-The pipeline gives several useful outputs such as the Landscapes (TE divergence to estimate the insertions) and PieChart (TE families proportions in the genome).
-Other graphs have been created with the script `graphs.R` to compare TE throught different sample generation. 
+The pipeline gives several useful outputs such as the **Landscapes** (TE divergence to estimate the insertions) and **PieChart** (TE families proportions in the genome).
+Other graphs have been created with the script `graphs.R` to compare TE throught different sample generations. 
 
 <img src="./TE_analysis/prop_ech_par_family.jpg"/>
 
