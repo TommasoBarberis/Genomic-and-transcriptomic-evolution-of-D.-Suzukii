@@ -385,6 +385,7 @@ Figure from the [tool publication](https://academic.oup.com/gbe/article/7/4/1192
 We had a lot of dependancies problems running dnaPipeTE so we used the [docker version](https://hub.docker.com/r/clemgoub/dnapipete).
 
 1. Copy input data
+
 Two different types of input are necessary to run the pipeline : 
 - The fastq files for each samples
 - `Drosophila_Transposable_Element_all.fasta` which is the Drosophila TE library from Repbase  
