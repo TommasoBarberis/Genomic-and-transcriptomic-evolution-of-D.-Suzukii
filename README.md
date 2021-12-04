@@ -375,7 +375,7 @@ All the steps are included in a tool named [dnaPipeTE](https://github.com/clemgo
 - Blastn, repeat quantification
 
 <img src="./TE_analysis/dnapipete.jpg"/>
-Figure from the [tool publication](https://academic.oup.com/gbe/article/7/4/1192/533768)
+Figure from the [tool article](https://academic.oup.com/gbe/article/7/4/1192/533768)
 
 ### 6.1 Running DnaPipeTE
 ```
