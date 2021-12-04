@@ -5,9 +5,11 @@
 1. [Context](#1-context)
 2. [Introduction to the project](#2-introduction-to-the-project)
 3. [Data](#3-data)
-4. [Workflow](#4-workflow)
-5. [Authors](#4-authors)
-6. [References](#5-references)
+4. [SNP Calling Workflow](#4-snp-calling-workflow)
+5. [Diversity Analysis] (#5-diversity-analysis)
+6. [TE Analysis] (#6-te-analysis)
+7. [Authors](#7-authors)
+8. [References](#8-references)
 
 ## 1. Context
 
@@ -32,7 +34,7 @@ __Transposable elements__ (__TE__) represent __47%__ of the _D. suzukii_ genome 
 
 ## 3. Data
 
-- DNA poolseq data from _D.suzukii_ obtained with paired-end Illumina sequencing (2x100pb), with 40 individuals for each pool:
+- DNA poolseq fastq from _D.suzukii_ obtained with paired-end Illumina sequencing (2x100pb), with 40 individuals for each pool:
     - One poolseq for G0;
     - One poolseq for each media in G12 (strawberry, cherry and cranberry).
 
@@ -65,11 +67,11 @@ Location: _pedago-ngs_
 /localdata/pandata/students/M2_projet_15/ref/Drosophila-suzukii-annotation-3-ws.gff3
 ```
 
-## 4. Workflow
+## 4. SNP Calling Workflow
 
 ### 4.1 Quality control
 
-First of all we checked the quality of the data, using `fastqc`:
+First of all we checked the quality of the data, using `fastqc` _(version v0.11.9)_:
 ```
 fastqc sample.fastq.gz
 ```
@@ -123,6 +125,7 @@ samtools stats sample.sam
 | G12-cerise_pe | 214319262 | 172440052 |
 | G12-cranb_pe | 261528888 | 212135984 |
 
+	
 #### Conversion to `.bam`
 ```
 samtools view -bS -@ 3 sample.sam > sample.bam
@@ -345,7 +348,7 @@ Location of `.vcf` result files: _pedago-ngs_
 | G12-cranberry | 116,006 | 75,305 | 1,050 | 
 
 
-### Comparison of our results from DNA data with RNA seq data
+### 4.4 Comparison of our results from DNA data with RNA seq data
 
 1. Compress VCF files: ```bgzip input_DNA_file.vcf``` and ```bgzip input_RNA_file.vcf```
 2. Build indexes for compressed files: ```tabix -p vcf input_DNA_file.vcf.gz``` and ```tabix -p vcf input_RNA_file.vcf.gz```
@@ -362,59 +365,82 @@ Location of 4 output result files: _pedago-ngs_
 - Third file: 0002.vcf for records from fraise/G12_fraise_MarkDuplicated.bam.vcf.gz shared by both     fraise/G12_fraise_MarkDuplicated.bam.vcf.gz variants_RNAseq.vcf
 - Fourth file: 0003.vcf for records from variants_RNAseq.vcf.gz shared by both  fraise/G12_fraise_MarkDuplicated.bam.vcf.gz variants_RNAseq.vcf.gz
 
-
-### TE analysis
-All the steps are included in a tool named dnaPipeTE (available on :https://github.com/clemgoub/dnaPipeTE)
-- Uniform samplings of the reads to produce low coverage data sets 
+## 5. Diversity Analysis
+	
+## 6. TE Analysis
+All the steps are included in a tool named [dnaPipeTE](https://github.com/clemgoub/dnaPipeTE)
+- Uniform samplings of the reads to produce low coverage data sets (read sampling to have <1X coverage of the genome to keep only repeated regions)
 - Trinity, repeated assembly of contigs
 - RepeatMasker, contigs annotation
 - Blastn, repeat quantification
 
+### 6.1 Running DnaPipeTE
+```
+#dnaPipeTE: version 1.3 (uses Perl 5, R v3.0.2, Python v3.8.5, Trinity v2.5.1, 
+			      RepeatMasker v4.0.5 including RMblastn, ncbi-blast v2.2.28+)
+```
+We had a lot of dependancies problem to run dnaPipeTE so we used the [docker version](https://hub.docker.com/r/clemgoub/dnapipete).
 
-### Versions of tools
-- FASTQC: version v0.11.9;
-- HiSAT2: version 2.1.0;
-- GATK: version 4.2.2.0;
-- SAMtools: version 1.9;
-- BCFtools: version 1.9;
-- dnaPipeTE: version 1.3 (uses Perl 5, R v3.0.2, Python v3.8.5, Trinity v2.5.1, RepeatMasker v4.0.5 including RMblastn, ncbi-blast v2.2.28+)
+1. Copy input data
+Two different type of input is necessary to run the pipeline : 
+- The fastq files for all the samples
+- `Drosophila_Transposable_Element_all.fasta` which is the Drosophila TE library from Repbase  
 
+Location : 
+```
+/localdata/pandata/students/M2_projet_15/TE/
+```
 
-## Polymoprhism Analysis
+They all had to be in a `~/Project` folder which is the communication folder between the computer and the container. 
 
-- Fastqc on all the files : 
-```fastqc input_file_name -o output_file_name``` 
-- Index building with hisat2 : 
-```hisat2-build -p 4 /data/home/mtabourin/Stage_M1/Drosophila-Suzukii/ref_suzukii/Drosophila-suzukii-contig.fasta index/```
-- Mapping with hisat 2 :
+2. Starting the container 
+```
+sudo docker pull clemgoub/dnapipete:latest
+sudo docker run -it -v ~/Project:/mnt clemgoub/dnapipete:latest
+```
 
-- Conversion of .sam files into .bam files :
-```samtools view -S -bh ../mapping/G0-MTP.sam | samtools sort -O bam -o G0-MTP-sorted.bam```
-- Index BAM files :
-```samtools index G0-MTP-sorted.bam```
-- Mpileup on .bam files and bcftools for call SNPs and short Indels :
+3. Run dnaPipeTE
+```
+cd /opt/dnaPipeTE
+python3 dnaPipeTE.py \ 
+		-input /mnt/data/sample_1.fastq.gz 
+		-output /mnt/output_dnapipete/sample 
+		-cpu 6 
+		-genome_size 270000000 
+		-genome_coverage 0.2 
+		-sample_number 2 
+		-RM_lib /mnt/Drosophila_Transposable_Element_all.fasta
+```
+- `-input`: input fastq or fastq.gz files (single end only);
+- `-output`: complete path with name for the outputs;
+- `-cpu`: maximum number of cpu to use;
+- `-genome_size`: here we know that _D.suzukii_ is 270Mb long;
+- `-genome_coverage`: for this genome size 0.2X is recommended in the Supplementary Material of the [tool article](https://academic.oup.com/gbe/article/7/4/1192/533768);
+- `-sample_number`: number of Trinity iterations;
+- `-RM_lib`: path to custom repeat library for RepeatMasker.
 
-```samtools mpileup sam_to_bam/G0-MTP-sorted.bam -f /data/home/mtabourin/Stage_M1/Drosophila-Suzukii/ref_suzukii/Drosophila-suzukii-contig.fasta > variant_calling_mpileup/G0-MTP.pileup```
+### 6.2 Results
 
-```bcftools mpileup -o G0-MTP-VCFfile.vcf -f /data/home/mtabourin/Stage_M1/Drosophila-Suzukii/ref_suzukii/Drosophila-suzukii-contig.fasta ../sam_to_bam/G0-MTP-sorted.bam```
-
-```bcftools call -vmO v -o bcftools_call/G0-MTP-VCFfile-call.vcf variant_calling_mpileup/G0-MTP-VCFfile.vcf```
-
-- Bcftools filter on .vcf files :
-```bcftools filter -O v -o bcftools_filtered/G0-MTP-VCFfile-filtered.vcf -s LOWQUAL -i 'QUAL>10' -g3 -G10 bcftools_call/G0-MTP-VCFfile-call.vcf```
-
-## TE analysis
-- dnaPipeTE on G0 file :
-```python3 ./dnaPipeTE.py -input /home/ubuntu/data/G0-MTP_1.fastq.gz -output /home/ubuntu/output_dnaPipeTE/G0 -cpu 6 -sample_number 2 -genome_size 270000000 -genome_coverage 0.2 -RM_lib /home/ubuntu/Drosophila_Transposable_Element_all.fasta -keep_Trinity_output```
-
-Sampling 2 samples of max 355263 reads to reach 0.2X coverage of the 270Mb genome of D.suzukii :
-For G0 fastq :
+Example of sampling for G0 :
+```
 total number of reads: 121247626
 maximum number of reads to sample:  710526
+fastq :  /mnt/G0-MTP_1.fastq
+sampling 2 samples of max 355263 reads to reach coverage...
+53999976 bases sampled in 355263 reads
+s_G0-MTP_1.fastq done.
+53999976 bases sampled in 710526 reads
+s_G0-MTP_1.fastq done.
+```
+The pipeline gives several useful outputs such as the Landscapes (TE divergence to estimate the insertions) and PieChart (TE families proportions in the genome).
+Other graphs have been created with the script `graphs.R` to compare TE throught different sample generation. 
+
+<img src="./img/prop_ech_par_family.jpg"/>
+
+Other graphs can be found in the `graphs.pdf` document.
 
 
-
-## 4. Authors
+## 7. Authors
 The project was developped by:
 - Chloé AUJOULAT
 - Tommaso BARBERIS
@@ -422,7 +448,7 @@ The project was developped by:
 - Marie VERNERET
 
 
-## 5. References
+## 8. References
 - Anand, Santosh, Eleonora Mangano, Nadia Barizzone, Roberta Bordoni, Melissa Sorosina, Ferdinando Clarelli, Lucia Corrado, Filippo Martinelli Boneschi, Sandra D’Alfonso, et Gianluca De Bellis. « Next Generation Sequencing of Pooled Samples: Guideline for Variants’ Filtering ». Scientific Reports 6, no 1 (27 septembre 2016): 33735. https://doi.org/10.1038/srep33735.
 - Chiu, Joanna C, Xuanting Jiang, Li Zhao, Christopher A Hamm, Julie M Cridland, Perot Saelao, Kelly A Hamby, et al. « Genome of Drosophila suzukii, the Spotted Wing Drosophila ». G3 Genes|Genomes|Genetics 3, no 12 (1 décembre 2013): 2257‑71. https://doi.org/10.1534/g3.113.008185.
 - Kofler, Robert, Daniel Gómez-Sánchez, et Christian Schlötterer. « PoPoolationTE2: Comparative Population Genomics of Transposable Elements Using Pool-Seq ». Molecular Biology and Evolution 33, no 10 (octobre 2016): 2759‑64. https://doi.org/10.1093/molbev/msw137.
