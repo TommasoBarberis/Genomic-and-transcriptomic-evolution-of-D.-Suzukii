@@ -6,8 +6,8 @@
 2. [Introduction to the project](#2-introduction-to-the-project)
 3. [Data](#3-data)
 4. [SNP Calling Workflow](#4-snp-calling-workflow)
-5. [Diversity Analysis] (#5-diversity-analysis)
-6. [TE Analysis] (#6-te-analysis)
+5. [Diversity Analysis](#5-diversity-analysis)
+6. [TE Analysis](#6-te-analysis)
 7. [Authors](#7-authors)
 8. [References](#8-references)
 
@@ -296,24 +296,24 @@ gatk SelectVariants \
 - `-O`: output file;
 - `--exclude-filtered`: exclude __SNPs__ marked to be filtered.
 
-#### 4.3.2 Get __SNPs__ that are in transcripts (mRNA)
+#### 4.3.2 Get __SNPs__ that are in transcripts (exons)
 
-1. From the `.gff3` file of the reference, we can extract a subset having only mRNA:
+1. From the `.gff3` file of the reference, we can extract a subset having only exons:
 ```
 tail -n +2 Drosophila-suzukii-annotation-3-ws.gff3 | \
-awk -F "\t" '{if($3=="mRNA") print $0}' > ~/mRNA.gff3
+awk -F "\t" '{if($3=="exon") print $0}' > ~/exon.gff3
 ```
 - `tail -n +2`: to skip `gff3` header;
-- `awk`: if the third field has 'mRNA' tag, it print the line in the `mRNA.gff3` file.
+- `awk`: if the third field has 'exon' tag, it print the line in the `exon.gff3` file.
 
 2. Convert the `.gff3` into `.bed` format:
 ```
-gff2bed < mRNA.gff3 > mRNA.bed
+gff2bed < exon.gff3 > exon.bed
 ```
 
 3. Intersect the `.vcf` file with the `.bed` file:
 ```
-intersectBed -a input.vcf -b mRNA.bed -header > output.vcf
+intersectBed -a input.vcf -b exon.bed -header > output.vcf
 ```
 - `-a`: `.vcf` input file;
 - `-b`: `.bed` input file;
@@ -340,15 +340,22 @@ python3 get_de.py
 
 Location of `.vcf` result files: _pedago-ngs_
 ```
-/localdata/pandata/students/M2_projet_15/GATK_pipeline/gatk_ploidy
+# DNA
+/localdata/pandata/students/M2_projet_15/GATK_pipeline/gatk_ploidy 
+# RNA
+/localdata/pandata/students/M2_projet_15/RNAseq/vcf 
 ```
+##### 4.3.4.1 SNPs founded on exons
+|  | G0 | cerise | fraise |
+| :-: | :-: | :-:| :-: |
+|DNA | 59,055 | 50,077 | 52,243 |
+| RNA | 28,150 | 29,823 | 31,052 |
 
-| | Total number of SNPs | SNPs on mRNA | SNPs on DE genes |
-| :-: | :-: | :-: | :-: |
-| G0-MTP | 189,567 | 121,646 | 1,465 |
-| G12-strawberry | 175,067 | 111,761 | 1,264 |
-| G12-cherry | 186,952 | 115,760 | 1,242 |
-| G12-cranberry | 116,006 | 75,305 | 1,050 | 
+##### 4.3.4.1 SNPs founded on exons of DE genes
+|  | G0 | cerise | fraise |
+| :-: | :-: | :-:| :-: |
+|DNA | 536 | 415 | 492 |
+| RNA | 17 | 36 | 51 |
 
 
 ### 4.4 Comparison of our results from DNA data with RNA seq data
