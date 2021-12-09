@@ -1,0 +1,3 @@
+# Linguist overrides
+*.html linguist-detectable=false
+./quality_control/*.html linguist-detectable=false
