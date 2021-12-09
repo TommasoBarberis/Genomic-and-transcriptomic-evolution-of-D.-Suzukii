@@ -31,6 +31,7 @@ The position of the genetic variations will be compared with previous SNP analys
 ### 2.2 TE analysis
 __Transposable elements__ (__TE__) represent __47%__ of the _D. suzukii_ genome and can be important in the adaptation process, interfering in gene regulation during evolution. The aim is to determine TEs age on our data and compute their abundance. Comparing abundance graphs between G0 and G12 will inform us if some recent TE insertions happened.
 
+All the project objectives are presented more precisely in the book of specifications file. 
 
 ## 3. Data
 
