@@ -320,21 +320,77 @@ intersectBed -a input.vcf -b exon.bed -header > output.vcf
 - `-header`: if the `.bed` file has header.
 
 #### 4.3.3  Get __SNPs__ that are in DE genes
-List of the DE genes can be found here: <br/>
 
-Location: _pedago-ngs_ 
+The list of differentially expressed genes is obtained by the M. Tabourin's work. From tables in her report, we retrieved the list of genes upregulated in cherry compared to G0 (`UP_cerise_G0.csv`), genes downregulated in cherry compared to G0 (`DOWN_cerise_G0.csv`), genes upregulated in strawberry compared to G0 (`UP_fraise_G0.csv`) and genes downregulated in strawberry compared to G0 (`DOWN_fraise_G0.csv`).
+These files can be founded here: _pedago-ngs_ 
 ```
-/localdata/pandata/students/M2_projet_15/DE_gene
+/localdata/pandata/students/M2_projet_15/DE_gene/csv
 ```
-This list is obtained by the M. Tabourin's work.
 
-1. Obtain a `.gff3` file containing only DE genes:
+1. From theses files we have concatenated the two `cerise_G0` together and the same for the strawberry:
+
+```
+cat *cerise_G0.csv >> concat_cerise_G0.csv
+cat *fraise_G0.csv >> concat_fraise_G0.csv
+```
+
+Then, we have retrieved the names of the genes contained in the first column:
+
+```
+cut -f1 -d" " concat_cerise_G0.csv > cerise_G0.txt
+cut -f1 -d" " concat_fraise_G0.csv > fraise_G0.txt
+```
+
+At the end, we have concatenated theses two files:
+
+```
+grep -Ffx cerise_G0.txt fraise_G0.txt > fruit_G0.txt
+```
+
+2. Obtain a `.gff3` file containing only DE genes:
 ```
 python3 get_de.py
 ```
-- `get_de.py`: it is a script written by us. It allows, from the `gff3` and the `list.txt` having DE genes, to obtain a `.gff3` file having only DE genes.
+- `get_de.py`: it is a script written by us (can be founded in the `scripts/` folder). It allows, from the `gff3` and the `list.txt` having DE genes, to obtain a `.gff3` file having only DE genes.
 
-2. Then we have transformed the obtained `.gff3` file into `.bed` file using the command `3` at the previous paragraph and we have used it to obtain __SNPs__ in DE genes using command `4` of the previous paragraph.
+3. Then we have transformed the obtained `.gff3` file into `.bed` file using the command `3` at the previous paragraph and we have used it as in the command `4` of the previous paragraph to obtain __SNPs__ in DE genes for the DNA data. <br/>
+
+4. For the RNAseq data we had to perform some additionnal steps, because we only had raw `vcf` files from the `GATK - HaplotypeCaller`.
+Location of these `vcf` files: _pedago-ngs_
+
+```
+/data/home/mtabourin/Stage_M1
+```
+
+	- for each file, we had to compress and index:
+	
+	```
+	bgzip -c file.vcf > file.vcf.gz
+	tabix -p vcf file.vcf.gz
+	```
+	
+		- `-c`: write to standard output;
+		- `-p`: index q `vcf`file.
+	
+	- we have merged replicates in a single file (in the RNAseq experience, each sample had 2 evolutionary replicates):
+	
+	```
+	bcftools merge --merge all rep1_file.vcf.gz rep1_file.vcf.gz > merged.vcf
+	```
+	
+		- `--merge`: to merge all type of variants.
+		
+	- we have performed a genotype calling on theses files:
+	
+	```
+	gatk GenotypeGVCFs -R Drosophila-suzukii.fasta -V file.vcf -O output.vcf
+	```
+	
+To find __SNPs__ in `vcf` files from RNAseq we have used the `intersect_vcf_degene.sh` script (in the folder `/scripts` of this repo) running the following command:
+
+```
+./intersect_vcf_degene.sh input.vcf output.vcf
+``` 
 
 #### 4.3.4 Results
 
