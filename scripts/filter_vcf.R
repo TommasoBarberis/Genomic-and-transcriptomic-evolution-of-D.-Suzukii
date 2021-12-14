@@ -1,0 +1,57 @@
+## Author: Tommaso Barberis
+library(ggplot2)
+
+data <- read.table("G0.table", header=T)
+
+qual_plot <- (ggplot(data, aes(QUAL)) 
+              + geom_density()
+              + xlim(0, 2000)
+              + geom_vline(xintercept = mean(data$QUAL), col = "red")
+              + geom_vline(xintercept = 70, col = "red", linetype="dashed")
+              # + annotate("text", x=2000, y=0.0015, label= paste0("mean: ", as.integer(mean(data$QUAL))))
+              # + annotate("text", x=2000, y=0.0012, label= paste0("max: ", max(data$QUAL)))
+              # + annotate("text", x=2000, y=0.0010, label= paste0("min: ", min(data$QUAL)))
+              )
+
+
+dp_plot <- (ggplot(data, aes(DP)) 
+            + geom_density()
+            + xlim(0, 250)
+            + geom_vline(xintercept = mean(data$DP), col = "red")
+            + geom_vline(xintercept = 25, col = "red", linetype="dashed")
+            # + annotate("text", x=170, y=0.009, label= paste0("mean: ", as.integer(mean(data$DP))))
+            # + annotate("text", x=170, y=0.0075, label= paste0("max: ", max(data$DP)))
+            # + annotate("text", x=170, y=0.006, label= paste0("min: ", min(data$DP)))
+)
+
+qd_plot <- (ggplot(data, aes(QD)) 
+            + geom_density()
+            # + xlim(0, 250)
+            + geom_vline(xintercept = mean(data$QD), col = "red")
+            + geom_vline(xintercept = 20, col = "red", linetype="dashed")
+)            
+
+mq_plot <- (ggplot(data, aes(MQ)) 
+            + geom_density()
+            # + xlim(0, 250)
+            + geom_vline(xintercept = mean(data$MQ), col = "red")
+            + geom_vline(xintercept = 50, col = "red", linetype="dashed")
+)            
+
+fs_plot <- (ggplot(data, aes(FS)) 
+            + geom_density()
+            + xlim(0, 20)
+            + geom_vline(xintercept = mean(data$FS), col = "red")
+            + geom_vline(xintercept = 1, col = "red", linetype="dashed")
+)            
+
+      
+sor_plot <- (ggplot(data, aes(SOR)) 
+             + geom_density()
+             + xlim(0, 10)
+             + geom_vline(xintercept = mean(data$SOR), col = "red")
+             + geom_vline(xintercept = 1.4, col = "red", linetype="dashed")
+             + annotate("text", x=7.5, y=0.7, label= paste0("mean: ", as.integer(mean(data$SOR))))
+             # + annotate("text", x=170, y=0.0075, label= paste0("max: ", max(data$DP)))
+             # + annotate("text", x=170, y=0.006, label= paste0("min: ", min(data$DP)))
+)
