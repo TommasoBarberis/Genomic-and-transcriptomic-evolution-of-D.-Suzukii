@@ -3,6 +3,8 @@ Ce script, à partir d'un fichier .gff et d'un fichier contenant une
 liste de gènes (un gène par ligne), permet d'extraire les lignes du
 .gff ayant comme valeur pour le champ 'Parent' le nom d'un des gènes
 contenus dans la liste.
+
+Auteur: Tommaso Barberis
 """
 import re 
 
