@@ -539,6 +539,7 @@ Fst_1-3.txt: G0-G12_cran
 Fst_1-4.txt: G0-G12_fraise
 
 4. Calculating Fst for DE genes:
+
  We write a script using Fst results and a list of DE gene in a bed format to calculate Fst for DE gene.
  As we use dichotomous search, the Fst file must be sorted like the pipeline does.
  You find it on the github repo:
