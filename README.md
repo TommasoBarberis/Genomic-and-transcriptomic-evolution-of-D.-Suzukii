@@ -26,7 +26,7 @@ A significant number of differentially expressed genes across generations has be
 
 ### 2.1 Polymorphism analysis
 The goal here is to analyse _D. suzukii_ polymorphism performing a __variant calling__ on the whole genome (using poolseq data) in order to count the number of different genomic positions between G0 and G12, and between fruits media. <br/>
-The position of the genetic variations will be compared with previous SNP analysis conducted on RNA-seq data to see if we also find an increase of the SNP number. To have a view more global on the genome's diversity, several diversity measures will be calculated: __pi's__ <img src="https://render.githubusercontent.com/render/math?math=\theta">, __Watterson's__ $\theta$, __Tajima's D__.
+The position of the genetic variations will be compared with previous SNP analysis conducted on RNA-seq data to see if we also find an increase of the SNP number. To have a view more global on the genome's diversity, several diversity measures will be calculated: __pi's__ <img src="https://render.githubusercontent.com/render/math?math=\theta">, __Watterson's__ <img src="https://render.githubusercontent.com/render/math?math=\theta">, __Tajima's D__.
 
 ### 2.2 TE analysis
 __Transposable elements__ (__TE__) represent __47%__ of the _D. suzukii_ genome and can be important in the adaptation process, interfering in gene regulation during evolution. The aim is to determine TEs age on our data and compute their abundance. Comparing abundance graphs between G0 and G12 will inform us if some recent TE insertions happened.
@@ -207,11 +207,11 @@ gatk HaplotypeCaller \
 - `-I`: input file;
 - `-O`: output file (`vcf` format);
 - `--sample-ploidy`: it allows to take in account of using pooled data:
-$sample\_ploidy = organism\_ploidy \times pool\_size$ <br>
+	<img src="https://render.githubusercontent.com/render/math?math=sample\_ploidy = organism\_ploidy \times pool\_size"> <br>
 In our case we have a ploidy of 2 (_D. suzukii_ is a diploïd organism) and a pool size of 40.
 - `--max-genotype-count`: maximum number of genotypes to consider at any site:
-$max\_genotype\_count = \binom{P +  A - 1}{A - 1} = \frac{(P + A - 1)!}{P!(A - 1)!}$ <br>
-With `P` la ploidy of the sample (previous formula) and `A` ($A = 3$) the allele count. 
+- <img src="https://render.githubusercontent.com/render/math?math=max\_genotype\_count = \binom{P +  A - 1}{A - 1} = \frac{(P + A - 1)!}{P!(A - 1)!}"> <br>
+With `P` la ploidy of the sample (previous formula) and `A` (<img src="https://render.githubusercontent.com/render/math?math=A = 3">) the allele count. 
 
 #### 4.3.1 SNPs filtering
 
@@ -368,7 +368,7 @@ Location of `.vcf` result files: _pedago-ngs_
 
 Location of 4 output result files: _pedago-ngs_
 ```
-/localdata/pandata/students/M2_projet_15/GATK_pipeline/gatk_ploidy/$fruit
+/localdata/pandata/students/M2_projet_15/GATK_pipeline/gatk_ploidy/*fruit
 ```
 - First file: 0000.vcf for records private to  fraise/G12_fraise_MarkDuplicated.bam.vcf.gz
 - Second file: 0001.vcf for records private to  variants_RNAseq.vcf.gz
@@ -468,7 +468,7 @@ Output G0.snps:
 
 RESULTS:
 ```
-/localdata/pandata/students/M2_projet_15/GATK_pipeline/PoPoolation$
+/localdata/pandata/students/M2_projet_15/GATK_pipeline/PoPoolation
 ```
 <div align="center">
 
@@ -548,7 +548,7 @@ cat fst_tot.txt | sed 's/1:3=//' | awk  -F" " '{print $1" " $2" " $7}'> Fst_1-3.
 cat fst_tot.txt | sed 's/1:4=//' | awk  -F" " '{print $1" " $2" " $8}'> Fst_1-4.txt
 ```
 ```
-/localdata/pandata/students/M2_projet_15/GATK_pipeline/PoPoolation2$
+/localdata/pandata/students/M2_projet_15/GATK_pipeline/PoPoolation2
 ```
 Fst_1-2.txt: G0-G12_cerise
 
