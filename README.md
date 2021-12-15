@@ -26,7 +26,7 @@ A significant number of differentially expressed genes across generations has be
 
 ### 2.1 Polymorphism analysis
 The goal here is to analyse _D. suzukii_ polymorphism performing a __variant calling__ on the whole genome (using poolseq data) in order to count the number of different genomic positions between G0 and G12, and between fruits media. <br/>
-The position of the genetic variations will be compared with previous SNP analysis conducted on RNA-seq data to see if we also find an increase of the SNP number. To have a view more global on the genome's diversity, several diversity measures will be calculated: __pi's__ $\theta$, __Watterson's__ $\theta$, __Tajima's D__.
+The position of the genetic variations will be compared with previous SNP analysis conducted on RNA-seq data to see if we also find an increase of the SNP number. To have a view more global on the genome's diversity, several diversity measures will be calculated: __pi's__ <img src="https://render.githubusercontent.com/render/math?math=\theta">, __Watterson's__ $\theta$, __Tajima's D__.
 
 ### 2.2 TE analysis
 __Transposable elements__ (__TE__) represent __47%__ of the _D. suzukii_ genome and can be important in the adaptation process, interfering in gene regulation during evolution. The aim is to determine TEs age on our data and compute their abundance. Comparing abundance graphs between G0 and G12 will inform us if some recent TE insertions happened.
