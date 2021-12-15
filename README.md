@@ -281,6 +281,12 @@ You can find here the plot used to define some scores: <br/>
 - `-V`: `vcf` input file;
 - `-O`: output file;
 - `-filter`: define a filter;
+	-  `QUAL`: Phred-scaled quality score for the assertion made in alternative;
+	-  `DP`: read depth at this position for this sample;
+	-  `QD`: this is the variant confidence (from the QUAL field) divided by the unfiltered depth of non-hom-ref samples;
+	-  `MQ`: mapping quality;
+	-  `FS`: this is the Phred-scaled probability that there is strand bias at the site;
+	-  `SOR`: this is another way to estimate strand bias using a test similar to the symmetric odds ratio test;
 - `--filter-name`: used to assign a name to the filter.
 
 4. Extract __SNPs__ who passed the filters:
@@ -319,6 +325,13 @@ intersectBed -a input.vcf -b exon.bed -header > output.vcf
 - `-b`: `.bed` input file;
 - `-header`: if the `.bed` file has header.
 
+4. Count the number of gene for a given sample:
+- for DNA data we have used `gene_count.py` that can be founded in the `scripts/` folder;
+- for the RNA data we have used the following command (car genes are used as chromosome/contig in these files):
+ ```
+ grep -v "#" file.vcf | cut -f1 | sort | uniq | wc -l
+ ```
+
 #### 4.3.3  Get __SNPs__ that are in DE genes
 List of the DE genes can be found here: <br/>
 
@@ -336,6 +349,20 @@ python3 get_de.py
 
 2. Then we have transformed the obtained `.gff3` file into `.bed` file using the command `3` at the previous paragraph and we have used it to obtain __SNPs__ in DE genes using command `4` of the previous paragraph.
 
+3. Finally we have compute the intersect of the `vcf` files from DNA and RNA. Unfortunately, these `vcf` files (DNA and RNA) were generated with a different reference, so we have wrote a script to convert genomic positions of the RNA `vcf` files to DNA positions. It can be found in the `scripts/` folder as `convert_vcf_pos.py`. Then we have run the following commands:
+```
+# Compress VCF files
+bgzip input_DNA_file.vcf
+bgzip input_RNA_file.vcf
+
+# Build indexes for compressed files
+tabix -p vcf input_DNA_file.vcf.gz
+tabix -p vcf input_RNA_file.vcf.gz
+
+# run the intersection between the two files
+bcftools isec -c snps -p output/ input_DNA_file.vcf.gz input_RNA_file.vcf.gz
+```
+
 #### 4.3.4 Results
 
 Location of `.vcf` result files: _pedago-ngs_
@@ -346,34 +373,26 @@ Location of `.vcf` result files: _pedago-ngs_
 /localdata/pandata/students/M2_projet_15/RNAseq/vcf 
 ```
 ##### 4.3.4.1 SNPs founded on exons
-|  | G0 | cerise | fraise |
-| :-: | :-: | :-:| :-: |
-|DNA | 59,055 | 50,077 | 52,243 |
-| RNA | 28,150 | 29,823 | 31,052 |
+|  | G0 | cerise | fraise | gene count |
+| :-: | :-: | :-:| :-: | :-: |
+|DNA | 59,055 | 50,077 | 52,243 | 9,837 |
+| RNA | 28,150 | 29,823 | 31,052 | 5,248 |
+
+In the DNA data we find almost double compared to the RNA, but this can be easily explained by the number of genes that is also double. Nevertheless we observe a decrease from G0 to G12 for DNA, which is rather consistent with the basic hypothesis of having a selection effect.
+On the other hand, in RNA, the number does not decrease.
 
 ##### 4.3.4.1 SNPs founded on exons of DE genes
 |  | G0 | cerise | fraise |
 | :-: | :-: | :-:| :-: |
 |DNA | 536 | 415 | 492 |
 | RNA | 17 | 36 | 51 |
+| intersect | 1 | 8 | 7 |
 
+On differentially expressed genes, there are many more SNPs on the DNA than on the RNA. It is suspected that this may be due to having poolseq data for DNA. 
+We find again a decrease between G0 and G12 for DNA (is it significant?) but not between G0 and G7 for RNA.
 
-### 4.4 Comparison of our results from DNA data with RNA seq data
+The SNP founde both in RNA and DNA is on Contig 9. The 8 SNPs for the cherry are founded on Contig 9 (2), Contig 44 (5) and Contig 49 (1). The 7 SNPs for the strawberry are founded on Andromeda (1), Cepheus (1), Contig (5), Contig 9 (1), Contig 10 (1) and Contig 44 (2).
 
-1. Compress VCF files: ```bgzip input_DNA_file.vcf``` and ```bgzip input_RNA_file.vcf```
-2. Build indexes for compressed files: ```tabix -p vcf input_DNA_file.vcf.gz``` and ```tabix -p vcf input_RNA_file.vcf.gz```
-3. Run bcftools isec to make the intersection between the files of interest: ```bcftools isec -c snps -p fraise/ input_DNA_file.vcf.gz input_RNA_file.vcf.gz path2repository```
-
-#### Results
-
-Location of 4 output result files: _pedago-ngs_
-```
-/localdata/pandata/students/M2_projet_15/GATK_pipeline/gatk_ploidy/*fruit
-```
-- First file: 0000.vcf for records private to  fraise/G12_fraise_MarkDuplicated.bam.vcf.gz
-- Second file: 0001.vcf for records private to  variants_RNAseq.vcf.gz
-- Third file: 0002.vcf for records from fraise/G12_fraise_MarkDuplicated.bam.vcf.gz shared by both     fraise/G12_fraise_MarkDuplicated.bam.vcf.gz variants_RNAseq.vcf
-- Fourth file: 0003.vcf for records from variants_RNAseq.vcf.gz shared by both  fraise/G12_fraise_MarkDuplicated.bam.vcf.gz variants_RNAseq.vcf.gz
 
 ## 5. Diversity & Differentiation Analysis
 
