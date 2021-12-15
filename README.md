@@ -6,7 +6,7 @@
 2. [Introduction to the project](#2-introduction-to-the-project)
 3. [Data](#3-data)
 4. [SNP Calling Workflow](#4-snp-calling-workflow)
-5. [Diversity and Differentiation Analysis](#5-diversity-and-differentiation-analysis)
+5. [Diversity Analysis](#5-diversity-analysis)
 6. [TE Analysis](#6-te-analysis)
 7. [Authors](#7-authors)
 8. [References](#8-references)
@@ -320,77 +320,21 @@ intersectBed -a input.vcf -b exon.bed -header > output.vcf
 - `-header`: if the `.bed` file has header.
 
 #### 4.3.3  Get __SNPs__ that are in DE genes
+List of the DE genes can be found here: <br/>
 
-The list of differentially expressed genes is obtained by the M. Tabourin's work. From tables in her report, we retrieved the list of genes upregulated in cherry compared to G0 (`UP_cerise_G0.csv`), genes downregulated in cherry compared to G0 (`DOWN_cerise_G0.csv`), genes upregulated in strawberry compared to G0 (`UP_fraise_G0.csv`) and genes downregulated in strawberry compared to G0 (`DOWN_fraise_G0.csv`).
-These files can be founded here: _pedago-ngs_ 
+Location: _pedago-ngs_ 
 ```
-/localdata/pandata/students/M2_projet_15/DE_gene/csv
+/localdata/pandata/students/M2_projet_15/DE_gene
 ```
+This list is obtained by the M. Tabourin's work.
 
-1. From theses files we have concatenated the two `cerise_G0` together and the same for the strawberry:
-
-```
-cat *cerise_G0.csv >> concat_cerise_G0.csv
-cat *fraise_G0.csv >> concat_fraise_G0.csv
-```
-
-Then, we have retrieved the names of the genes contained in the first column:
-
-```
-cut -f1 -d" " concat_cerise_G0.csv > cerise_G0.txt
-cut -f1 -d" " concat_fraise_G0.csv > fraise_G0.txt
-```
-
-At the end, we have concatenated theses two files:
-
-```
-grep -Ffx cerise_G0.txt fraise_G0.txt > fruit_G0.txt
-```
-
-2. Obtain a `.gff3` file containing only DE genes:
+1. Obtain a `.gff3` file containing only DE genes:
 ```
 python3 get_de.py
 ```
-- `get_de.py`: it is a script written by us (can be founded in the `scripts/` folder). It allows, from the `gff3` and the `list.txt` having DE genes, to obtain a `.gff3` file having only DE genes.
+- `get_de.py`: it is a script written by us. It allows, from the `gff3` and the `list.txt` having DE genes, to obtain a `.gff3` file having only DE genes.
 
-3. Then we have transformed the obtained `.gff3` file into `.bed` file using the command `3` at the previous paragraph and we have used it as in the command `4` of the previous paragraph to obtain __SNPs__ in DE genes for the DNA data. <br/>
-
-4. For the RNAseq data we had to perform some additionnal steps, because we only had raw `vcf` files from the `GATK - HaplotypeCaller`.
-Location of these `vcf` files: _pedago-ngs_
-
-```
-/data/home/mtabourin/Stage_M1
-```
-
-	- for each file, we had to compress and index:
-	
-	```
-	bgzip -c file.vcf > file.vcf.gz
-	tabix -p vcf file.vcf.gz
-	```
-	
-		- `-c`: write to standard output;
-		- `-p`: index q `vcf`file.
-	
-	- we have merged replicates in a single file (in the RNAseq experience, each sample had 2 evolutionary replicates):
-	
-	```
-	bcftools merge --merge all rep1_file.vcf.gz rep1_file.vcf.gz > merged.vcf
-	```
-	
-		- `--merge`: to merge all type of variants.
-		
-	- we have performed a genotype calling on theses files:
-	
-	```
-	gatk GenotypeGVCFs -R Drosophila-suzukii.fasta -V file.vcf -O output.vcf
-	```
-	
-To find __SNPs__ in `vcf` files from RNAseq we have used the `intersect_vcf_degene.sh` script (in the folder `/scripts` of this repo) running the following command:
-
-```
-./intersect_vcf_degene.sh input.vcf output.vcf
-``` 
+2. Then we have transformed the obtained `.gff3` file into `.bed` file using the command `3` at the previous paragraph and we have used it to obtain __SNPs__ in DE genes using command `4` of the previous paragraph.
 
 #### 4.3.4 Results
 
@@ -431,9 +375,9 @@ Location of 4 output result files: _pedago-ngs_
 - Third file: 0002.vcf for records from fraise/G12_fraise_MarkDuplicated.bam.vcf.gz shared by both     fraise/G12_fraise_MarkDuplicated.bam.vcf.gz variants_RNAseq.vcf
 - Fourth file: 0003.vcf for records from variants_RNAseq.vcf.gz shared by both  fraise/G12_fraise_MarkDuplicated.bam.vcf.gz variants_RNAseq.vcf.gz
 
-## 5. Diversity and Differentiation Analysis
+## 5. Diversity & Differentiation Analysis
 
-#### 5.0.1 Installating PoPoolation
+# Installating PoPoolation: Diversity Analysis 
 
 All the steps come from PoPoolation website (https://sourceforge.net/p/popoolation/wiki/browse_pages/) and Dr. Kofler presentation (https://www.kofler.or.at/bioinformatic/wp-content/uploads/2018/07/pooledAnalysis_part1.pdf)
 
@@ -443,14 +387,10 @@ cd popoolation-code
 svn update
 ```
 
-### 5.1 Diversity Analysis workflow
-
-1. Remove low quality alignments:
-
+1. Remove low quality alignments
 ```
-time samtools view -q 20 -f 0x0002 -F 0x0004 -F 0x0008 -b G0_MarkDuplicated.bam > G0_q20_MarkDuplicated.bam
+time samtools view -q 20 -f 0x0002 -F 0x0004 -F 0x0008 -b G0_MarkDuplicated.bam > G0_q20_MarkDuplicated.bam #26m
 ```
-
 - `-q 20` only keep reads with a mapping quality higher than 20 (remove ambiguously aligned reads)
 - `-f 0x0002` only keep proper pairs (remember flags from sam file)
 - `-F 0x0004` remove reads that are not mapped
@@ -458,83 +398,79 @@ time samtools view -q 20 -f 0x0002 -F 0x0004 -F 0x0008 -b G0_MarkDuplicated.bam 
 
 Note `-f` means only keep reads having the given flag and `-F` discard all reads having the given flag.	
 
-2. Creating a mpileup file:
-
+2. Creating a mpileup file
 ```
-time samtools mpileup -B -Q 0 -f Drosophila-suzukii-contig.fasta G0_q20_MarkDuplicated.bam > G0.mpileup
+time samtools mpileup -B -Q 0 -f Drosophila-suzukii-contig.fasta G0_q20_MarkDuplicated.bam > G0.mpileup #20m
 ```
-
 - `-B` disable BAQ computation (base alignment quality)
 - `-Q` skip bases with base quality smaller than the given value
 - `-f` path to reference sequence
 
-`.mpileup` files:
-- column 1: reference chromosome;
-- column 2: position;
-- column 3: reference character;
-- column 4: coverage;
-- column 5: bases for the given position (`.` identical to reference character in forward strand; 	`,` identical to reference in reverse strand);
-- column 6: quality for the bases.
+MPILEUP FILE:
+- col1 reference chromosome
+- col2 position
+- col3 reference character
+- col4 coverage
+- col5 bases for the given position (’.’ identical to reference character -forward strand; ’,’ identical to reference - reverse strand)
+- col6 quality for the bases
 
-3. Filtering indels:
-
+3. Filtering indels
 ```
-time perl identify-genomic-indel-regions.pl --indel-window 5 --min-count 2 --input G0.mpileup --output indels_G0.gtf
+time perl ~/Documents/Projet_S3/Popoolation/popoolation-code/basic-pipeline/identify-genomic-indel-regions.pl --indel-window 5 --min-count 2 --input G0.mpileup --output indels_G0.gtf #25m
 ```
-
-- `identify-genomic-indel-regions.pl`: script from `Popoolation`;
-- `--indel-window` how many bases surrounding indels should be ignored;
-- `--min-count` minimum count for calling an indel. Note that indels may be sequencing errors as well.
-
+- –indel-window how many bases surrounding indels should be ignored
+- –min-count minimum count for calling an indel. Note that indels may be sequencing errors as well
 ```
-time perl filter-pileup-by-gtf.pl --input G0.mpileup --gtf indels_G0.gtf --output G0.idf.mpileup
+time perl ~/Documents/Projet_S3/Popoolation/popoolation-code/basic-pipeline/filter-pileup-by-gtf.pl --input G0.mpileup --gtf indels_G0.gtf --output G0.idf.mpileup #20m
 ```
 4. Subsampling to uniform coverage
-Several population genetic estimators are sensitive to sequencing errors. For example a very low __Tajima’s D__, usually indicative of a selective sweep, may be, as an artifact, frequently be found in highly covered regions because these regions have just more sequencing errors. To avoid these kinds of biases we recommend to subsample to an uniform coverage:
-
+Several population genetic estimators are sensitive to sequencing errors. For example a very low Tajima’s D, usually indicative of a selective sweep, may be, as an artifact, frequently be found in highly covered regions because these regions have just more sequencing errors. To avoid these kinds of biases we recommend to subsample to an uniform coverage.
 ```
-time perl subsample-pileup.pl --min-qual 20 --method withoutreplace --max-coverage 50 --fastq-type sanger --target-coverage 10 --input G0.idf.mpileup --output G0.ss10.idf.mpileup
+time perl ~/Documents/Projet_S3/Popoolation/popoolation-code/basic-pipeline/subsample-pileup.pl --min-qual 20 --method withoutreplace --max-coverage 50 --fastq-type sanger --target-coverage 10 --input G0.idf.mpileup --output G0.ss10.idf.mpileup #343m
+```
+- –min-qual minimum base quality
+- –method method for subsampling, we recommend without replacement
+- –target-coverage which coverage should the resulting mpileup file have
+- –max-coverage the maximum allowed coverage, regions having higher coverages will be ignored (they may be copy number variations and lead to wrong SNPs)
+- –fastq-type (sanger means offset 33)
+
+5. Calculating Tajima’s Pi
+```
+time perl ~/Documents/Projet_S3/Popoolation/popoolation-code/Variance-sliding.pl --fastq-type sanger --measure pi --input G0.ss10.idf.mpileup --min-count 2 --min-coverage 4 --max-coverage 10 --min-covered-fraction 0.5 --pool-size 80 --window-size 1000 --step-size 1000 --output G0.pi --snp-output G0.snps
+```
+- –min-coverage –max-coverage: for subsampled files not important; should contain target
+coverage, i.e.: 10
+- –min-covered-fraction minimum percentage of sites having sufficient coverage in the given window
+- –min-count minimum occurrence of allele for calling a SNP
+- –measure which population genetics measure should be computed (pi/theta/D)
+- –pool-size number of chromosomes (thus number of diploids times two)
+- –region compute the measure only for a small region; default is the whole genome
+- –output a file containing the measure (π) for the windows
+- –snp-output a file containing for every window the SNPs that have been used for computing the measure (e.g. π)
+- –window-size –step-size control behavior of sliding window; if step size is smaller than window size than the windows will be overlapping.
+
+Output G0.pi:
+
+- col 1: reference chromosome
+- col 2: position of window (mean value)
+- col 3: number of SNPs in the given window
+- col 4: fraction of sites in the window having sufficient coverage (min ≤ x ≤ max)
+- col 5: measure for the window (π)
+
+Output G0.snps:
+
+- col 1: reference chromosome
+- col 2: position of SNP
+- col 3: reference character
+- col 4: coverage
+- col 5-9: counts of A, T, C, G, N respectively
+
+RESULTS:
+```
+/localdata/pandata/students/M2_projet_15/GATK_pipeline/PoPoolation$
 ```
 
-- `subsample-pileup.pl`: script from `Popoolation;
-- `--min-qual` minimum base quality;
-- `--method` method for subsampling, we recommend without replacement;
-- `--target-coverage` which coverage should the resulting mpileup file have;
-- `--max-coverage` the maximum allowed coverage, regions having higher coverages will be ignored (they may be copy number variations and lead to wrong SNPs);
-- `--fastq-type` (sanger means offset 33).
-
-5. Calculating __Tajima’s__ $\pi$:
-
-```
-time perl Variance-sliding.pl --fastq-type sanger --measure pi --input G0.ss10.idf.mpileup --min-count 2 --min-coverage 4 --max-coverage 10 --min-covered-fraction 0.5 --pool-size 80 --window-size 1000 --step-size 1000 --output G0.pi --snp-output G0.snps
-```
-
-- `--min-coverage`, `--max-coverage`: for subsampled files not important; should contain target
-coverage (i.e.: 10);
-- `--min-covered-fraction` minimum percentage of sites having sufficient coverage in the given window;
-- `--min-count minimum` occurrence of allele for calling a SNP;
-- `--measure` which population genetics measure should be computed ($\pi$ / $\theta$ / $D$);
-- `--pool-size` number of chromosomes (thus number of diploids times two);
-- `--region` compute the measure only for a small region, default is the whole genome;
-- `--output` a file containing the measure ($\pi$) for the windows;
-- `--snp-output` a file containing for every window the SNPs that have been used for computing the measure (e.g. $\pi$);
-- `--window-size`, `--step-size` control behavior of sliding window. If step size is smaller than window size than the windows will be overlapping.
-
-Output `G0.pi` explanation:
-- column 1: reference chromosome;
-- column 2: position of window (mean value);
-- column 3: number of SNPs in the given window;
-- column 4: fraction of sites in the window having, sufficient coverage (min ≤ x ≤ max);
-- column 5: measure for the window ($\pi$).
-
-Output `G0.snps` explanation:
-- column 1: reference chromosome;
-- column 2: position of SNP;
-- column 3: reference character;
-- column 4: coverage;
-- columns 5-9: counts of A, T, C, G, N respectively.
-
-#### 5.0.2 Installating PoPoolation2
+# Installating PoPoolation2: Differentiation Analysis
 
 All the steps comes from PoPoolation website (https://sourceforge.net/p/popoolation2/wiki/Home/) and Dr. Kofler presentation (https://www.kofler.or.at/bioinformatic/wp-content/uploads/2018/07/pooledAnalysis_part2.pdf)
 
@@ -544,54 +480,78 @@ cd popoolation2-code/
 svn update
 ```
 
-### 5.2 Differentiation Analysis
-
-1. Create a `mpileup`:
-
+1. Create a mpileup
 ```
 time samtools mpileup -B -Q 0 -f Drosophila-suzukii-contig.fasta G0_q20_MarkDuplicated.bam G12_cerise_q20_MarkDuplicated.bam G12_cran_q20_MarkDuplicated.bam G12_fraise_q20_MarkDuplicated.bam > p1-4.mpileup # 77m
 ```
+MPILEUP:
 
-__MPILEUP__: Very similar to the mpileup with one sample. In this multi-pileup (mpileup) three additional columns are created for each additional sample. Thus for each sample the following information is provided:
-- the coverage, columns $4 + n ∗ 3$;
-- the bases, columns $5 + n ∗ 3$;
-- the corresponding base quality, columns $6 + n ∗ 3$;
+Very similar to the mpileup with one sample. In this multi-pileup (mpileup) three additional columns are created for each additional sample. Thus for each sample the following information is provided:
+- the coverage, columns 4 + n ∗ 3
+- the bases, columns 5 + n ∗ 3
+- the corresponding base quality, columns 6 + n ∗ 3
 
-2. Conversion to sync-file:
+2. Conversion to sync-file
 
-In order to use PoPoolation2 we have to convert the `mpileup` to a sync file.
-This may seem unnecessary to you, but it serves to speed up the analysis, because the time consuming part of the analysis - parsing of the `mpileup` file - needs just to be performed once.
-
+In order to use PoPoolation2 we have to convert the mpileup to a sync file.
+This may seem unnecessary to you, but it serves to speed up the analysis,
+because the time consuming part of the analysis - parsing of the mpileup file -
+needs just to be performed once.
 ```
-time java -jar mpileup2sync.jar --input p1-4.mpileup --output p1-4.sync --fastq-type sanger --min-qual 20 --threads 15 
+time java -jar ~/Documents/Projet_S3/Popoolation/popoolation2-code/mpileup2sync.jar --input p1-4.mpileup --output p1-4.sync --fastq-type sanger --min-qual 20 --threads 15 #78m
 ```
+THE SYNC-FILE:
 
-The `sync` file:
+- col 1: reference chromosome
+- col 2: position
+- col 3: reference character
+- col 4: allele counts for first population
+- col 5: allele counts for second population
+- col n: allele counts for n-3 population
 
-- column 1: reference chromosome;
-- column 2: position;
-- column 3: reference character;
-- column 4: allele counts for first population;
-- column 5: allele counts for second population;
-- column n: allele counts for n-3 population.
+- Allele counts are in the form ”A:T:C:G:N:del”
+- the sync-file provides a convenient summary of the allele counts of several populations (there
+is no upper threshold of the population number).
+- subsampling to an uniform coverage with the PoPoolation2 pipeline should be done using such a sync-file
 
-Allele counts are in the form `A:T:C:G:N:del`. The sync-file provides a convenient summary of the allele counts of several populations (there is no upper threshold of the population number). Subsampling to an uniform coverage with the `PoPoolation2` pipeline should be done using such a sync-file.
-
-3. Calculating the $F_{st}$:
+3. Calculating the Fst
 ```
-time perl fst-sliding.pl --window-size 1 --step-size 1 --suppress-noninformative --input small.sync --min-covered-fraction 1.0 --min-coverage 4 --max-coverage 120 --min-count 3 --output fst.txt --pool-size 80
+time perl ~/Documents/Projet_S3/Popoolation/popoolation2-code/fst-sliding.pl --window-size 1 --step-size 1 --suppress-noninformative --input p1-4.sync --min-covered-fraction 1.0 --min-coverage 4 --max-coverage 120 --min-count 3 --output fst_tot.txt --pool-size 80 #386m
 ```
-- `--suppress-noninformative` suppresses output for windows not containing a SNP. When applied to windows of size one, this option suppresses output for bases that are no SNP. 
+- --suppress-noninformative suppresses output for windows not containing a SNP. When applied to windows of size one, this option suppresses output for bases that are no SNP. 
 
-Output of the $F_{st}$ script:
+OUTPUT OF THE Fst SCRIPT:
 
-- column 1: reference chromosome;
-- column 2: position;
-- column 3: window size (1 for single SNPs);
-- column 4: covered fraction (relevant for minimum covered fraction);
-- column 5: average minimum coverage for the window across all populations (the higher the more reliable the estimate);
-- column 6: pairwise F ST comparing population 1 with population 2;
-- column 7: etc for ALL pairwise comparisons of the populations present in the sync file.
+- col 1: reference chromosome
+- col 2: position
+- col 3: window size (1 for single SNPs)
+- col 4: covered fraction (relevant for minimum covered fraction)
+- col 5: average minimum coverage for the window across all populations (the higher the more reliable the estimate)
+- col 6: pairwise Fst comparing population 1 with population 2
+- col 7: etc for ALL pairwise comparisons of the populations present in the sync file
+
+RESULTS:
+```
+/localdata/pandata/students/M2_projet_15/GATK_pipeline/PoPoolation2$
+```
+Fst_1-2.txt: G0-G12_cerise
+Fst_1-3.txt: G0-G12_cran
+Fst_1-4.txt: G0-G12_fraise
+
+4. Calculating Fst for DE genes:
+ We write a script using Fst results and a list of DE gene in a bed format to calculate Fst for DE gene.
+ As we use dichotomous search, the Fst file must be sorted like the pipeline does.
+ You find it on the github repo:
+```
+ scripts/Fst_DE_Genes.py
+```
+5. Visualisation of Fst on chromosomes:
+
+We write a function in R to visualize the Fst on a choosen chromosome.
+You find it on the github repo:
+```
+ scripts/VisualisationFst.R
+```
 
 ## 6. TE Analysis
 All the steps are included in a tool named [dnaPipeTE](https://github.com/clemgoub/dnaPipeTE)
