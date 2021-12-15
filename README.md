@@ -478,6 +478,7 @@ RESULTS:
 | écart type   |     0.01250     |      0.01289    |     0.01468     |     0.01418     |
 
 </div>
+
 # Installating PoPoolation2: Differentiation Analysis
 
 All the steps comes from PoPoolation website (https://sourceforge.net/p/popoolation2/wiki/Home/) and Dr. Kofler presentation (https://www.kofler.or.at/bioinformatic/wp-content/uploads/2018/07/pooledAnalysis_part2.pdf)
@@ -587,7 +588,9 @@ You find it on the github repo:
  scripts/VisualisationFst.R
 ```
 <img src="./img/Fst.png"/>
+
 ## 6. TE Analysis
+
 All the steps are included in a tool named [dnaPipeTE](https://github.com/clemgoub/dnaPipeTE)
 - Uniform samplings of the reads to produce low coverage data sets (read sampling to have <1X coverage of the genome to keep only repeated regions)
 - Trinity, repeated assembly of contigs
