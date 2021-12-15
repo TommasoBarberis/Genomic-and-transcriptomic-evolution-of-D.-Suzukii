@@ -59,8 +59,7 @@ def FstGenesDE(file1,file2):
     for i in geneFst:
         som.append(float(i[2]))
     print(f'Nombres de SNPs:{len(som)} \nFst moyen: {statistics.mean(som)} \nFst écart type: {statistics.pstdev(som)}')
-    #return 'Nombres de SNPs:',len(som),'Fst moyen:', statistics.mean(som),'Fst écart type:',statistics.pstdev(som)
-
+    return geneFst
 PosDE = "/home/bertrand/Cours Bioinfo/Projet_3/pos_DE.txt"
 FstFile = "/home/bertrand/Cours Bioinfo/Projet_3/Fst_1-2.txt"
 

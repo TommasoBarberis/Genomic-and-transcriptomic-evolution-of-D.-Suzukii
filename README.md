@@ -424,6 +424,7 @@ time perl ~/Documents/Projet_S3/Popoolation/popoolation-code/basic-pipeline/iden
 time perl ~/Documents/Projet_S3/Popoolation/popoolation-code/basic-pipeline/filter-pileup-by-gtf.pl --input G0.mpileup --gtf indels_G0.gtf --output G0.idf.mpileup #20m
 ```
 4. Subsampling to uniform coverage
+
 Several population genetic estimators are sensitive to sequencing errors. For example a very low Tajima’s D, usually indicative of a selective sweep, may be, as an artifact, frequently be found in highly covered regions because these regions have just more sequencing errors. To avoid these kinds of biases we recommend to subsample to an uniform coverage.
 ```
 time perl ~/Documents/Projet_S3/Popoolation/popoolation-code/basic-pipeline/subsample-pileup.pl --min-qual 20 --method withoutreplace --max-coverage 50 --fastq-type sanger --target-coverage 10 --input G0.idf.mpileup --output G0.ss10.idf.mpileup #343m
@@ -531,11 +532,20 @@ OUTPUT OF THE Fst SCRIPT:
 - col 7: etc for ALL pairwise comparisons of the populations present in the sync file
 
 RESULTS:
+
+We separate the fst_tot.txt file in 3 files each containing one comparison with G0.
+```
+cat fst_tot.txt | sed 's/1:2=//' | awk  -F" " '{print $1" " $2" " $6}'> Fst_1-2.txt
+cat fst_tot.txt | sed 's/1:3=//' | awk  -F" " '{print $1" " $2" " $7}'> Fst_1-3.txt
+cat fst_tot.txt | sed 's/1:4=//' | awk  -F" " '{print $1" " $2" " $8}'> Fst_1-4.txt
+```
 ```
 /localdata/pandata/students/M2_projet_15/GATK_pipeline/PoPoolation2$
 ```
 Fst_1-2.txt: G0-G12_cerise
+
 Fst_1-3.txt: G0-G12_cran
+
 Fst_1-4.txt: G0-G12_fraise
 
 4. Calculating Fst for DE genes:
@@ -548,7 +558,7 @@ Fst_1-4.txt: G0-G12_fraise
 ```
 5. Visualisation of Fst on chromosomes:
 
-We write a function in R to visualize the Fst on a choosen chromosome.
+We write a function in R to visualize the Fst on a chosen chromosome.
 You find it on the github repo:
 ```
  scripts/VisualisationFst.R
