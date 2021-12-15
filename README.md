@@ -470,7 +470,14 @@ RESULTS:
 ```
 /localdata/pandata/students/M2_projet_15/GATK_pipeline/PoPoolation$
 ```
+<div align="center">
 
+| Theta Pi     |       G0        |  G12 cranberry  |    G12 cerise   |    G12 fraise   |
+| :----------: | :-------------: | :-------------: | :-------------: | :-------------: |
+| moyenne      |     0.00830     |      0.00771    |     0.00939     |     0.00864     |
+| écart type   |     0.01250     |      0.01289    |     0.01468     |     0.01418     |
+
+</div>
 # Installating PoPoolation2: Differentiation Analysis
 
 All the steps comes from PoPoolation website (https://sourceforge.net/p/popoolation2/wiki/Home/) and Dr. Kofler presentation (https://www.kofler.or.at/bioinformatic/wp-content/uploads/2018/07/pooledAnalysis_part2.pdf)
@@ -547,6 +554,22 @@ Fst_1-2.txt: G0-G12_cerise
 Fst_1-3.txt: G0-G12_cran
 
 Fst_1-4.txt: G0-G12_fraise
+<div align="center">
+
+|  Fst totalité des SNP | G0-G12 cranberry|  G0-G12 cerise  |  G0-G12 fraise  |   
+| :-------------------: | :-------------: | :-------------: | :-------------: | 
+| moyenne               |     0.02347     |      0.03759    |     0.03145     |    
+| écart type            |     0.03630     |      0.05538    |     0.04696     |     
+
+</div>
+<div align="center">
+
+|     Fst gènes DE      | G0-G12 cranberry|  G0-G12 cerise  |  G0-G12 fraise  |   
+| :-------------------: | :-------------: | :-------------: | :-------------: | 
+| moyenne               |     0.02188     |      0.03429    |     0.02229     |    
+| écart type            |     0.03374     |      0.04879    |     0.03373     |     
+
+</div>
 
 4. Calculating Fst for DE genes:
 
@@ -563,7 +586,7 @@ You find it on the github repo:
 ```
  scripts/VisualisationFst.R
 ```
-
+<img src="./img/Fst.png"/>
 ## 6. TE Analysis
 All the steps are included in a tool named [dnaPipeTE](https://github.com/clemgoub/dnaPipeTE)
 - Uniform samplings of the reads to produce low coverage data sets (read sampling to have <1X coverage of the genome to keep only repeated regions)
